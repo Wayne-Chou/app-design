@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>網站地圖</title>
+    <style>
+      body {
+        font-family: "Segoe UI", "Noto Sans TC", sans-serif;
+        background: #f8f9fa;
+        margin: 0;
+        padding: 40px;
+        color: #333;
+      }
+
+      h1 {
+        text-align: center;
+        margin-bottom: 30px;
+      }
+
+      .sitemap-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 20px;
+        max-width: 1000px;
+        margin: 0 auto;
+      }
+
+      .sitemap-item {
+        background: #fff;
+        border-radius: 10px;
+        box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+        padding: 20px;
+        transition: all 0.3s ease;
+        border-left: 6px solid #007bff;
+      }
+
+      .sitemap-item:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
+      }
+
+      .sitemap-item h3 {
+        margin-top: 0;
+        color: #007bff;
+        font-size: 1.1rem;
+      }
+
+      .sitemap-item p {
+        font-size: 0.9rem;
+        color: #555;
+      }
+
+      .sitemap-item a {
+        display: inline-block;
+        margin-top: 10px;
+        text-decoration: none;
+        color: #fff;
+        background: #007bff;
+        padding: 8px 14px;
+        border-radius: 6px;
+        font-size: 0.9rem;
+        transition: background 0.3s;
+      }
+
+      .sitemap-item a:hover {
+        background: #0056b3;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>🌐 網站地圖</h1>
+
+    <div class="sitemap-container">
+      <div class="sitemap-item">
+        <h3>app起坐操作介面</h3>
+
+        <a href="app-interface/index.html" target="_blank">前往頁面</a>
+      </div>
+      <div class="sitemap-item">
+        <h3>登入畫面</h3>
+
+        <a href="login/login.html" target="_blank">前往頁面</a>
+      </div>
+      <div class="sitemap-item">
+        <h3>登入後畫面</h3>
+
+        <a href="login/home.html" target="_blank">前往頁面</a>
+      </div>
+      <div class="sitemap-item">
+        <h3>歷史鑑測資料頁</h3>
+
+        <a href="page/report.html" target="_blank">前往頁面</a>
+      </div>
+      <div class="sitemap-item">
+        <h3>歷史鑑測資料詳細頁</h3>
+
+        <a href="page/report-detail.html" target="_blank">前往頁面</a>
+      </div>
+      <div class="sitemap-item">
+        <h3>鑑測結果頁</h3>
+
+        <a href="page/assessment-result.html" target="_blank">前往頁面</a>
+      </div>
+      <div class="sitemap-item">
+        <h3>鑑測人員管理頁</h3>
+
+        <a href="page/assessment-selection.html" target="_blank">前往頁面</a>
+      </div>
+    </div>
+  </body>
+</html>

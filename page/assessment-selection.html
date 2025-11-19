@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <title>現場鑑測模擬</title>
+    <style>
+      body {
+        font-family: "Segoe UI", sans-serif;
+        background: #e0f7fa;
+        margin: 0;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+      }
+      .content {
+        background: #fff;
+        width: 100%;
+        max-width: 480px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+      .header {
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 12px 16px;
+        background: #0d9488;
+        color: #fff;
+      }
+      .header i {
+        font-size: 20px;
+        cursor: pointer;
+      }
+      .progress-info {
+        width: 100%;
+        text-align: center;
+        font-weight: 600;
+        color: #333;
+        margin: 10px 0 5px 0;
+        font-size: 14px;
+      }
+      .date-records {
+        width: 100%;
+        padding: 0 10px;
+        margin-bottom: 10px;
+        max-height: 120px;
+        overflow-y: auto;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        background: #f9f9f9;
+      }
+      .date-records h6 {
+        font-weight: 600;
+        margin-bottom: 5px;
+      }
+      .date-records .date-item {
+        background: #f0f0f0;
+        padding: 6px 10px;
+        border-radius: 4px;
+        margin-bottom: 4px;
+        font-size: 14px;
+      }
+      .search-box {
+        width: 100%;
+        margin-bottom: 12px;
+        padding: 0 10px;
+      }
+      .person-list {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        max-height: 300px;
+        overflow-y: auto;
+        margin-bottom: 20px;
+        padding: 0 10px;
+      }
+      .person-card {
+        background: #fff;
+        padding: 14px 16px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        cursor: pointer;
+        transition: all 0.2s;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+      }
+      .person-card.completed {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+      .person-card.selected {
+        border: 2px solid #0d9488;
+      }
+      .start-btn {
+        width: 100%;
+        padding: 14px;
+        background: #0d9488;
+        color: #fff;
+        font-weight: 600;
+        border: none;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 8px;
+        font-size: 16px;
+      }
+      .start-btn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+      .modal-header i {
+        cursor: pointer;
+      }
+      .img {
+        display: none;
+      }
+
+      .design-preview-btn {
+        position: fixed;
+        top: 20px;
+        left: 20px;
+        background: #0d9488;
+        color: #fff;
+        border: none;
+        padding: 8px 14px;
+        border-radius: 10px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        font-size: 14px;
+        z-index: 2000;
+      }
+      .design-preview-btn:active {
+        transform: scale(0.95);
+      }
+      .vertical-info {
+        width: 100%;
+        text-align: center;
+        font-size: 13px;
+        color: #555;
+        margin-bottom: 8px;
+      }
+    </style>
+  </head>
+  <body>
+    <button
+      class="design-preview-btn"
+      data-bs-toggle="modal"
+      data-bs-target="#designPreviewModal"
+    >
+      對照原始畫面
+    </button>
+    <div class="content">
+      <div class="header">
+        <i class="fa-solid fa-arrow-left"></i>
+        <i
+          class="fa-solid fa-user-plus"
+          data-bs-toggle="modal"
+          data-bs-target="#createModal"
+          title="建立身分"
+        ></i>
+      </div>
+
+      <div class="progress-info" id="progressInfo">
+        目前第 1 位 / 已完成 2 位 / 共 5 位
+      </div>
+      <div class="vertical-info">與地垂直差:50度左右偏移:-0.09</div>
+      <div class="date-records" id="dateRecords">
+        <h6>鑑測日期紀錄</h6>
+      </div>
+
+      <div class="search-box">
+        <input
+          type="text"
+          class="form-control"
+          id="searchInput"
+          placeholder="搜尋人員"
+        />
+      </div>
+
+      <div class="person-list" id="personList">
+        <div class="person-card">王小明</div>
+        <div class="person-card completed">李小華</div>
+        <div class="person-card">陳大華</div>
+        <div class="person-card">林小美</div>
+        <div class="person-card completed">張三</div>
+        <div class="person-card">趙四</div>
+        <div class="person-card">錢五</div>
+        <div class="person-card">孫六</div>
+      </div>
+
+      <button class="start-btn" disabled>
+        <i class="fa-solid fa-play"></i> 開始
+      </button>
+    </div>
+
+    <div class="modal fade" id="createModal" tabindex="-1">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <i class="fa-solid fa-arrow-left" data-bs-dismiss="modal"></i>
+            <h5 class="modal-title">建立身分資料</h5>
+          </div>
+          <div class="modal-body">
+            <div class="mb-3">
+              <label class="form-label">姓名</label>
+              <input type="text" class="form-control" placeholder="輸入姓名" />
+            </div>
+            <div class="mb-3">
+              <label class="form-label">性別</label>
+              <select class="form-select">
+                <option value="">請選擇性別</option>
+                <option value="male">男</option>
+                <option value="female">女</option>
+              </select>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">生日</label>
+              <input type="date" class="form-control" />
+            </div>
+            <button class="btn btn-primary w-100">建立完成</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 分隔線 -->
+    <div class="modal fade" id="designPreviewModal" tabindex="-1">
+      <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">對照原始畫面</h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+            ></button>
+          </div>
+          <div class="modal-body text-center">
+            <img src="/img/5.jpg" class="img-fluid rounded" alt="" />
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+  const personList = document.getElementById("personList");
+  const personCards = personList.querySelectorAll(".person-card");
+  const startBtn = document.querySelector(".start-btn");
+  const searchInput = document.getElementById("searchInput");
+  const progressInfo = document.getElementById("progressInfo");
+  const dateRecords = document.getElementById("dateRecords");
+  let selectedPerson = null;
+
+  // 模擬大量鑑測日期
+  const dates = [];
+  for (let i = 1; i <= 50; i++) {
+    const month = ((i % 12) + 1).toString().padStart(2, "0");
+    const day = (((i * 2) % 28) + 1).toString().padStart(2, "0");
+    dates.push(`2025-${month}-${day}`);
+  }
+  dates.forEach((d) => {
+    const div = document.createElement("div");
+    div.classList.add("date-item");
+    div.textContent = d;
+    dateRecords.appendChild(div);
+  });
+
+  // 選擇人員與更新進度
+  function updateProgress(card) {
+    const allCards = Array.from(personCards);
+    const currentIndex = allCards.indexOf(card) + 1;
+    const completedCount = document.querySelectorAll(
+      ".person-card.completed"
+    ).length;
+    progressInfo.textContent = `目前第 ${currentIndex} 位 / 已完成 ${completedCount} 位 / 共 ${personCards.length} 位`;
+    personCards.forEach((c) => c.classList.remove("selected"));
+    card.classList.add("selected");
+    selectedPerson = card.textContent;
+    startBtn.disabled = false;
+  }
+
+  // 綁定點擊事件
+  personCards.forEach((card) => {
+    card.addEventListener("click", () => updateProgress(card));
+  });
+
+  // 搜尋功能
+  searchInput.addEventListener("input", () => {
+    const filter = searchInput.value.toLowerCase();
+    personCards.forEach((card) => {
+      card.style.display = card.textContent.toLowerCase().includes(filter)
+        ? ""
+        : "none";
+    });
+  });
+</script>

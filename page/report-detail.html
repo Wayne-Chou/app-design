@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <title>歷史鑑測資料 - 詳細頁</title>
+    <style>
+      body {
+        font-family: "Segoe UI", sans-serif;
+        background: #e0f7fa;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding-top: 20px;
+      }
+
+      .page-container {
+        width: 100%;
+        max-width: 420px;
+        background: #ffffff;
+        border-radius: 20px;
+        padding: 20px;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+        margin-bottom: 30px;
+      }
+
+      /* Header */
+      .header {
+        display: flex;
+        align-items: center;
+        padding: 12px 0;
+        margin-bottom: 20px;
+        border-bottom: 1px solid #e0e0e0;
+      }
+      .header i {
+        font-size: 26px;
+        cursor: pointer;
+        margin-right: 15px;
+        color: #0d9488;
+      }
+      .header h2 {
+        margin: 0;
+        font-size: 20px;
+        font-weight: 700;
+        color: #0d9488;
+      }
+
+      /* 搜尋框 */
+      .search-box .input-group {
+        border-radius: 15px;
+        overflow: hidden;
+        margin-bottom: 20px;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+      }
+      .search-box .input-group-text {
+        background: #f0f0f0;
+        border: none;
+        color: #0d9488;
+        font-size: 18px;
+      }
+      .search-box .form-control {
+        border: none;
+        padding: 10px 12px;
+      }
+
+      /* 歷史紀錄列表 */
+      .history-list {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+
+      .history-item {
+        background: #f8fdfc;
+        border-radius: 15px;
+        padding: 15px 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+        transition: all 0.2s;
+        cursor: pointer;
+      }
+      .history-item:hover {
+        transform: scale(0.98);
+        box-shadow: 0 6px 14px rgba(0, 0, 0, 0.12);
+      }
+
+      .history-item .info {
+        display: flex;
+        flex-direction: column;
+      }
+      .history-item .info span.name {
+        font-weight: 700;
+        font-size: 16px;
+        color: #1a1a1a;
+      }
+      .history-item .info span.gender,
+      .history-item .info span.birth {
+        font-size: 13px;
+        color: #555555;
+      }
+
+      .btn-result {
+        background: #0d9488;
+        color: #fff;
+        border: none;
+        padding: 8px 12px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        transition: all 0.2s;
+      }
+      .btn-result i {
+        margin-right: 5px;
+      }
+      .btn-result:active {
+        background: #056d63;
+        transform: scale(0.95);
+      }
+      .img {
+        display: none;
+      }
+
+      .design-preview-btn {
+        position: fixed;
+        top: 20px;
+        left: 20px;
+        background: #0d9488;
+        color: #fff;
+        border: none;
+        padding: 8px 14px;
+        border-radius: 10px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        font-size: 14px;
+        z-index: 2000;
+      }
+      .design-preview-btn:active {
+        transform: scale(0.95);
+      }
+    </style>
+  </head>
+  <body>
+    <button
+      class="design-preview-btn"
+      data-bs-toggle="modal"
+      data-bs-target="#designPreviewModal"
+    >
+      對照原始畫面
+    </button>
+
+    <div class="page-container">
+      <!-- Header -->
+      <div class="header">
+        <i class="fa-solid fa-angle-left" onclick="history.back()"></i>
+        <h2 id="regionName">台北市 - 鑑測紀錄</h2>
+      </div>
+
+      <!-- 搜尋框 -->
+      <div class="search-box">
+        <div class="input-group">
+          <span class="input-group-text">
+            <i class="fa-solid fa-magnifying-glass"></i>
+          </span>
+          <input type="text" class="form-control" placeholder="搜尋姓名 " />
+        </div>
+      </div>
+
+      <!-- 歷史紀錄列表 -->
+      <div class="history-list">
+        <div class="history-item">
+          <div class="info">
+            <span class="name">王小明</span>
+            <span class="detail"><i class="fa-solid fa-mars"></i> 男</span>
+            <span class="detail"
+              ><i class="fa-solid fa-calendar"></i> 1990 (33歲)</span
+            >
+          </div>
+          <button class="btn-result">
+            <i class="fa-solid fa-file-lines"></i>鑑測結果
+          </button>
+        </div>
+
+        <div class="history-item">
+          <div class="info">
+            <span class="name">李小華</span>
+            <span class="detail"><i class="fa-solid fa-venus"></i> 女</span>
+            <span class="detail"
+              ><i class="fa-solid fa-calendar"></i> 1988 (35歲)</span
+            >
+          </div>
+          <button class="btn-result">
+            <i class="fa-solid fa-file-lines"></i>鑑測結果
+          </button>
+        </div>
+
+        <div class="history-item">
+          <div class="info">
+            <span class="name">陳大文</span>
+            <span class="detail"><i class="fa-solid fa-mars"></i> 男</span>
+            <span class="detail"
+              ><i class="fa-solid fa-calendar"></i> 1992 (31歲)</span
+            >
+          </div>
+          <button class="btn-result">
+            <i class="fa-solid fa-file-lines"></i>鑑測結果
+          </button>
+        </div>
+      </div>
+      <div class="modal fade" id="designPreviewModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title">對照原始畫面</h5>
+              <button
+                type="button"
+                class="btn-close"
+                data-bs-dismiss="modal"
+              ></button>
+            </div>
+            <div class="modal-body text-center">
+              <img src="/img/3.jpg" class="img-fluid rounded" alt="" />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
+<script>
+  const searchInput = document.querySelector(".search-box .form-control");
+  const historyList = document.querySelector(".history-list");
+
+  // 建立「查無資料」
+  const noDataItem = document.createElement("div");
+  noDataItem.className = "history-item";
+  noDataItem.style.justifyContent = "center";
+  noDataItem.style.background = "#ffe5e5";
+  noDataItem.innerText = "查無資料";
+  noDataItem.style.color = "#d32f2f";
+  noDataItem.style.fontWeight = "700";
+
+  searchInput.addEventListener("input", () => {
+    const query = searchInput.value.trim().toLowerCase();
+    const items = historyList.querySelectorAll(".history-item");
+
+    let hasVisible = false;
+
+    items.forEach((item) => {
+      const nameEl = item.querySelector(".name");
+      if (!nameEl) return;
+
+      const name = nameEl.innerText.toLowerCase();
+      if (name.includes(query)) {
+        item.style.display = "flex";
+        hasVisible = true;
+      } else {
+        item.style.display = "none";
+      }
+    });
+
+    // 顯示查無資料
+    if (!hasVisible) {
+      if (!historyList.contains(noDataItem)) {
+        historyList.appendChild(noDataItem);
+      }
+    } else {
+      if (historyList.contains(noDataItem)) {
+        historyList.removeChild(noDataItem);
+      }
+    }
+  });
+</script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
