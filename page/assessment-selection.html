@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -50,28 +49,7 @@
         text-align: center;
         font-weight: 600;
         color: #333;
-        margin: 10px 0 5px 0;
-        font-size: 14px;
-      }
-      .date-records {
-        width: 100%;
-        padding: 0 10px;
-        margin-bottom: 10px;
-        max-height: 120px;
-        overflow-y: auto;
-        border: 1px solid #ddd;
-        border-radius: 6px;
-        background: #f9f9f9;
-      }
-      .date-records h6 {
-        font-weight: 600;
-        margin-bottom: 5px;
-      }
-      .date-records .date-item {
-        background: #f0f0f0;
-        padding: 6px 10px;
-        border-radius: 4px;
-        margin-bottom: 4px;
+        margin: 10px 0 10px 0;
         font-size: 14px;
       }
       .search-box {
@@ -127,10 +105,6 @@
       .modal-header i {
         cursor: pointer;
       }
-      .img {
-        display: none;
-      }
-
       .design-preview-btn {
         position: fixed;
         top: 20px;
@@ -175,13 +149,9 @@
         ></i>
       </div>
 
-      <div class="progress-info" id="progressInfo">
-        目前第 1 位 / 已完成 2 位 / 共 5 位
-      </div>
+      <div class="progress-info" id="progressInfo">已完成 2 位 / 共 8 位</div>
+
       <div class="vertical-info">與地垂直差:50度左右偏移:-0.09</div>
-      <div class="date-records" id="dateRecords">
-        <h6>鑑測日期紀錄</h6>
-      </div>
 
       <div class="search-box">
         <input
@@ -208,6 +178,7 @@
       </button>
     </div>
 
+    <!-- 建立身分 Modal -->
     <div class="modal fade" id="createModal" tabindex="-1">
       <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
@@ -238,7 +209,7 @@
       </div>
     </div>
 
-    <!-- 分隔線 -->
+    <!-- 原始畫面 Modal -->
     <div class="modal fade" id="designPreviewModal" tabindex="-1">
       <div class="modal-dialog modal-dialog-centered modal-lg">
         <div class="modal-content">
@@ -258,40 +229,21 @@
     </div>
   </body>
 </html>
-
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-
 <script>
   const personList = document.getElementById("personList");
   const personCards = personList.querySelectorAll(".person-card");
   const startBtn = document.querySelector(".start-btn");
   const searchInput = document.getElementById("searchInput");
   const progressInfo = document.getElementById("progressInfo");
-  const dateRecords = document.getElementById("dateRecords");
   let selectedPerson = null;
 
-  // 模擬大量鑑測日期
-  const dates = [];
-  for (let i = 1; i <= 50; i++) {
-    const month = ((i % 12) + 1).toString().padStart(2, "0");
-    const day = (((i * 2) % 28) + 1).toString().padStart(2, "0");
-    dates.push(`2025-${month}-${day}`);
-  }
-  dates.forEach((d) => {
-    const div = document.createElement("div");
-    div.classList.add("date-item");
-    div.textContent = d;
-    dateRecords.appendChild(div);
-  });
-
-  // 選擇人員與更新進度
   function updateProgress(card) {
-    const allCards = Array.from(personCards);
-    const currentIndex = allCards.indexOf(card) + 1;
     const completedCount = document.querySelectorAll(
       ".person-card.completed"
     ).length;
-    progressInfo.textContent = `目前第 ${currentIndex} 位 / 已完成 ${completedCount} 位 / 共 ${personCards.length} 位`;
+    const totalCount = personCards.length;
+    progressInfo.textContent = `已完成 ${completedCount} 位 / 共 ${totalCount} 位`;
     personCards.forEach((c) => c.classList.remove("selected"));
     card.classList.add("selected");
     selectedPerson = card.textContent;

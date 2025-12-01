@@ -12,6 +12,7 @@
       rel="stylesheet"
     />
     <title>鑑測結果頁</title>
+
     <style>
       :root {
         --primary: #0d9488;
@@ -29,8 +30,9 @@
         flex-direction: column;
         justify-content: center;
         align-items: center;
-        height: 100vh;
+        min-height: 100vh;
       }
+
       .header {
         margin-bottom: 20px;
       }
@@ -66,10 +68,26 @@
       /* 等級 */
       .level-box {
         margin-top: 16px;
-        background: #e0f7fa;
+
         padding: 12px 16px;
         border-radius: 12px;
         font-weight: 600;
+        color: #fff;
+      }
+      .level-danger {
+        background-color: #dc3545;
+      }
+
+      .level-warning {
+        background-color: #ffc107;
+      }
+
+      .level-primary {
+        background-color: #0d6efd;
+      }
+
+      .level-success {
+        background-color: #198754;
       }
 
       .section-title {
@@ -79,11 +97,112 @@
         color: var(--primary);
       }
 
-      .score-row {
+      .score-card {
+        background: #f8fdfd;
+        border-radius: 12px;
+        padding: 14px 16px;
+        margin-top: 14px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+      }
+
+      .score-icon {
+        font-size: 24px;
+        width: 38px;
+        height: 38px;
+        background: var(--primary);
+        color: #fff;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .score-icon i {
+        font-size: 20px;
+      }
+      .score-body {
+        flex: 1;
+      }
+
+      .score-body .name {
+        font-size: 15px;
+        font-weight: 600;
+        color: #333;
+      }
+
+      .score-body .meta {
+        font-size: 13px;
+        color: #777;
+        margin-top: 2px;
+      }
+
+      .score-body .bar {
+        margin-top: 6px;
+        background: #e6f5f4;
+        height: 8px;
+        border-radius: 6px;
+      }
+
+      .score-body .bar span {
+        display: block;
+        height: 100%;
+        background: var(--primary);
+        border-radius: 6px;
+      }
+
+      .score-value {
+        font-size: 18px;
+        font-weight: 700;
+        color: var(--primary);
+        min-width: 55px;
+        text-align: right;
+      }
+
+      .sppb-card {
+        margin-top: 16px;
+        padding: 16px;
+        background: #fffef5;
+        border-radius: 12px;
+        border-left: 4px solid #facc15;
+      }
+
+      .sppb-row {
         display: flex;
         justify-content: space-between;
-        padding: 10px 0;
-        border-bottom: 1px solid #eee;
+        align-items: center;
+      }
+
+      .sppb-title {
+        font-size: 16px;
+        font-weight: 700;
+        color: #b7791f;
+      }
+
+      .sppb-score {
+        font-size: 18px;
+        font-weight: 700;
+        color: #b7791f;
+      }
+
+      .sppb-card .bar {
+        margin-top: 10px;
+        height: 8px;
+        background: #fef3c7;
+        border-radius: 6px;
+        overflow: hidden;
+      }
+      .sppb-card .bar span {
+        display: block;
+        height: 100%;
+        background: #fbbf24;
+      }
+
+      .sppb-sub {
+        font-size: 13px;
+        color: #7c6f50;
+        margin-top: 8px;
       }
 
       /* 跌倒風險 */
@@ -93,27 +212,58 @@
         padding: 14px;
         border-radius: 12px;
         font-weight: 700;
-        color: #c53030;
+        color: #fff;
+      }
+      /* 危險 */
+      .risk-danger {
+        background: #ff5757;
+      }
+
+      /* 高 */
+      .risk-high {
+        background: #ffa203;
+      }
+
+      /* 中 */
+      .risk-medium {
+        background: #ffd039;
+        color: #663c00;
+      }
+
+      /* 稍低 */
+      .risk-low {
+        background: #8cff00;
+        color: #1a4000;
+      }
+
+      /* 低 */
+      .risk-verylow {
+        background: #4ffa00;
+        color: #0f3b00;
       }
 
       /* 分頁按鈕 */
       .pagination-area {
-        margin: 25px 0;
-        text-align: center;
+        margin-top: 28px;
+        display: flex;
+        gap: 12px;
       }
       .page-btn {
+        flex: 1;
+        padding: 12px 0;
+        font-size: 15px;
+        font-weight: 700;
         border: none;
-        padding: 10px 20px;
-        border-radius: 10px;
         background: var(--primary);
         color: #fff;
-        margin: 0 6px;
-        font-weight: 600;
-      }
-      .img {
-        display: none;
+        border-radius: 10px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12);
+        transition: 0.15s;
       }
 
+      .page-btn:active {
+        transform: scale(0.96);
+      }
       .design-preview-btn {
         position: fixed;
         top: 20px;
@@ -127,11 +277,9 @@
         font-size: 14px;
         z-index: 2000;
       }
-      .design-preview-btn:active {
-        transform: scale(0.95);
-      }
     </style>
   </head>
+
   <body>
     <button
       class="design-preview-btn"
@@ -140,59 +288,100 @@
     >
       對照原始畫面
     </button>
+
     <div class="result-card">
       <div class="header">
         <i class="fa-solid fa-arrow-left"></i>
       </div>
+
       <div class="name-title">王大明 鑑測結果</div>
       <div class="date-label">鑑測日期：2025/06/30</div>
 
-      <div class="level-box">您的等級：A級失能者</div>
+      <div class="level-box level-danger">您的等級：A級失能者</div>
+      <div class="level-box level-warning">您的等級：B級衰弱者</div>
+      <div class="level-box level-primary">您的等級：C級衰弱前期者</div>
+      <div class="level-box level-success">您的等級：D級健康者</div>
 
       <div class="section-title">各項測驗分數</div>
 
-      <div class="score-row">
-        <span>平衡測驗</span>
-        <strong>3 分</strong>
+      <div class="score-card" aria-label="平衡測驗">
+        <div class="score-icon">
+          <i class="fa-solid fa-child-reaching"></i>
+        </div>
+        <div class="score-body">
+          <div class="name">平衡測驗</div>
+          <div class="meta">3 / 4 分</div>
+          <div class="bar" aria-hidden="true">
+            <span style="width: 75%"></span>
+          </div>
+        </div>
+        <div class="score-value">3 分</div>
       </div>
 
-      <div class="score-row">
-        <span>起立行走測驗</span>
-        <strong>4 分</strong>
+      <div class="score-card" aria-label="起立行走測驗">
+        <div class="score-icon">
+          <i class="fa-solid fa-person-walking"></i>
+        </div>
+        <div class="score-body">
+          <div class="name">起立行走測驗</div>
+          <div class="meta">4 / 4 分</div>
+          <div class="bar" aria-hidden="true">
+            <span style="width: 100%"></span>
+          </div>
+        </div>
+        <div class="score-value">4 分</div>
       </div>
 
-      <div class="score-row">
-        <span>步行測驗</span>
-        <strong>3 分</strong>
+      <div class="score-card" aria-label="步行測驗">
+        <div class="score-icon">
+          <i class="fa-solid fa-person-running"></i>
+        </div>
+        <div class="score-body">
+          <div class="name">步行測驗</div>
+          <div class="meta">3 / 4 分</div>
+          <div class="bar" aria-hidden="true">
+            <span style="width: 75%"></span>
+          </div>
+        </div>
+        <div class="score-value">3 分</div>
       </div>
 
-      <div class="score-row">
-        <span>SPPB 總分</span>
-        <strong>10 分</strong>
+      <div class="card sppb-card" role="region" aria-label="SPPB 總分">
+        <div class="sppb-row">
+          <div class="sppb-title">SPPB 總分</div>
+          <div class="sppb-score">10 / 12</div>
+        </div>
+        <div class="bar" style="width: 100%">
+          <span style="width: 83%"></span>
+        </div>
+        <div class="sppb-sub">總結：建議進一步評估下肢肌力與平衡訓練</div>
       </div>
 
-      <div class="risk-box">跌倒風險：危險</div>
+      <div class="risk-box risk-danger">跌倒風險：危險</div>
+      <div class="risk-box risk-high">跌倒風險：高</div>
+      <div class="risk-box risk-medium">跌倒風險：中</div>
+      <div class="risk-box risk-low">跌倒風險：稍低</div>
+      <div class="risk-box risk-verylow">跌倒風險：低</div>
 
-      <!-- Pagination -->
       <div class="pagination-area">
         <button class="page-btn">上一頁</button>
         <button class="page-btn">下一頁</button>
       </div>
+    </div>
 
-      <div class="modal fade" id="designPreviewModal" tabindex="-1">
-        <div class="modal-dialog modal-dialog-centered modal-lg">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h5 class="modal-title">對照原始畫面</h5>
-              <button
-                type="button"
-                class="btn-close"
-                data-bs-dismiss="modal"
-              ></button>
-            </div>
-            <div class="modal-body text-center">
-              <img src="../img/2.jpg" class="img-fluid rounded" alt="" />
-            </div>
+    <div class="modal fade" id="designPreviewModal" tabindex="-1">
+      <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">對照原始畫面</h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+            ></button>
+          </div>
+          <div class="modal-body text-center">
+            <img src="../img/2.jpg" class="img-fluid rounded" alt="" />
           </div>
         </div>
       </div>
