@@ -77,13 +77,23 @@
         transition: all 0.2s;
         border: 1px solid #ddd;
         border-radius: 6px;
-      }
-      .person-card.completed {
-        opacity: 0.5;
-        cursor: not-allowed;
+        position: relative;
       }
       .person-card.selected {
         border: 2px solid #0d9488;
+      }
+      /* 已完成標籤 */
+      .person-card.completed::after {
+        content: "已完成";
+        position: absolute;
+        top: 8px;
+        right: 8px;
+        font-size: 12px;
+        color: #0d9488;
+        font-weight: 600;
+        background: rgba(13, 148, 136, 0.1);
+        padding: 2px 6px;
+        border-radius: 4px;
       }
       .start-btn {
         width: 100%;
