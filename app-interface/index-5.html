@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>走路轉身模擬</title>
+    <style>
+      body {
+        margin: 0;
+        background: #fff;
+        font-family: sans-serif;
+      }
+
+      .camera-wrapper {
+        position: relative;
+        max-width: 420px;
+        height: 100vh;
+        margin: auto;
+        background: #111;
+        overflow: hidden;
+      }
+
+      .overlay {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        width: 22%;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 10;
+      }
+      .overlay.left {
+        left: 0;
+      }
+      .overlay.right {
+        right: 0;
+      }
+
+      .focus-area {
+        position: absolute;
+        top: 45%;
+        left: 50%;
+        width: 56%;
+        height: 20%;
+        transform: translate(-50%, -50%);
+
+        background: rgba(255, 255, 255, 0.12);
+        border: 2px solid rgba(13, 148, 136, 0.8);
+
+        z-index: 15;
+        transition: all 0.3s;
+      }
+      .focus-area.active {
+        background: rgba(13, 148, 136, 0.18);
+        border: 2px solid rgba(13, 148, 136, 0.6);
+      }
+
+      .status {
+        position: absolute;
+        top: 16px;
+        width: 100%;
+        text-align: center;
+        color: #fff;
+        background: rgba(0, 0, 0, 0.45);
+        padding: 10px;
+        font-weight: 700;
+        z-index: 30;
+        line-height: 1.4;
+        transition: background 0.3s;
+      }
+      .status.success {
+        background: rgba(13, 148, 136, 0.85);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="camera-wrapper">
+      <div class="status" id="status">請往前走，到指定位置</div>
+      <div class="overlay left"></div>
+      <div class="overlay right"></div>
+      <div class="focus-area" id="focusArea"></div>
+    </div>
+
+    <script>
+      const status = document.getElementById("status");
+      const focusArea = document.getElementById("focusArea");
+
+      function simulateWalk() {
+        // 到達站位
+        focusArea.classList.add("active");
+        status.classList.add("success");
+        status.textContent = "到達站位！請轉身";
+
+        // 2 秒後完成轉身
+        setTimeout(() => {
+          status.textContent = "完成轉身！";
+
+          // 再 2 秒後重置
+          setTimeout(resetSimulation, 2000);
+        }, 2000);
+      }
+
+      function resetSimulation() {
+        focusArea.classList.remove("active");
+        status.classList.remove("success");
+        status.textContent = "請往前走，到指定位置";
+
+        // 2 秒後重新模擬
+        setTimeout(simulateWalk, 2000);
+      }
+
+      // 開始模擬
+      setTimeout(simulateWalk, 2000);
+    </script>
+  </body>
+</html>

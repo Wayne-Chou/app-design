@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>起坐測試</title>
+
+    <style>
+      body {
+        margin: 0;
+        background: #fff;
+        font-family: sans-serif;
+      }
+
+      .camera-wrapper {
+        position: relative;
+        max-width: 420px;
+        height: 100vh;
+        margin: auto;
+        background: #111;
+        overflow: hidden;
+      }
+
+      .overlay {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        width: 22%;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 10;
+      }
+      .overlay.left {
+        left: 0;
+      }
+      .overlay.right {
+        right: 0;
+      }
+
+      .focus-area {
+        position: absolute;
+        top: 45%;
+        left: 50%;
+        width: 56%;
+        height: 20%;
+        transform: translate(-50%, -50%);
+
+        background: rgba(255, 255, 255, 0.12);
+        border: 2px solid rgba(13, 148, 136, 0.8);
+
+        z-index: 15;
+        transition: all 0.3s;
+      }
+      .focus-area.active {
+        background: rgba(13, 148, 136, 0.18);
+        border: 2px solid rgba(13, 148, 136, 0.6);
+      }
+
+      .status {
+        position: absolute;
+        top: 16px;
+        width: 100%;
+        text-align: center;
+        color: #fff;
+        background: rgba(0, 0, 0, 0.45);
+        padding: 10px;
+        font-weight: 700;
+        z-index: 30;
+        line-height: 1.4;
+      }
+
+      .status.success {
+        background: rgba(13, 148, 136, 0.85);
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="camera-wrapper">
+      <div class="status" id="status">請起身站直<br />已完成：0 / 5 次</div>
+
+      <div class="overlay left"></div>
+      <div class="overlay right"></div>
+
+      <div class="focus-area" id="focusArea"></div>
+    </div>
+
+    <script>
+      const status = document.getElementById("status");
+      const focusArea = document.getElementById("focusArea");
+
+      const targetCount = 5;
+      let count = 0;
+      let pose = "sitting";
+      let completed = false;
+
+      function resetTest() {
+        count = 0;
+        pose = "sitting";
+        completed = false;
+        focusArea.classList.remove("active");
+        status.classList.remove("success");
+        status.innerHTML = "請起身站直<br>已完成：0 / 5 次";
+      }
+
+      setInterval(() => {
+        if (completed) return;
+
+        pose = pose === "sitting" ? "standing" : "sitting";
+
+        if (pose === "standing") {
+          count++;
+          focusArea.classList.add("active");
+          status.classList.add("success");
+          status.innerHTML = `站立完成<br>已完成：${count} / ${targetCount} 次`;
+        } else {
+          focusArea.classList.remove("active");
+          status.classList.remove("success");
+          status.innerHTML = `請起身站直<br>已完成：${count} / ${targetCount} 次`;
+        }
+
+        if (count >= targetCount) {
+          completed = true;
+
+          focusArea.classList.remove("active");
+          status.classList.add("success");
+          status.innerHTML = "測試完成";
+
+          setTimeout(resetTest, 2500);
+        }
+      }, 1800);
+    </script>
+  </body>
+</html>

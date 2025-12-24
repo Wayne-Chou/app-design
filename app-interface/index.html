@@ -193,7 +193,7 @@
       width: 100%;
       max-width: 420px;
       background: var(--card);
-      border-radius: 20px 20px 0 0;
+
       padding: 20px;
       box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.15);
       transition: transform 0.4s ease, bottom 0.4s ease;
@@ -351,7 +351,7 @@
     .assistive-btn-small {
       padding: 8px 16px;
       font-size: 14px;
-      border-radius: 14px;
+
       border: 2px solid var(--primary);
       background: #fff;
       color: var(--primary);
@@ -365,27 +365,6 @@
     }
     .assistive-btn-small:active {
       transform: scale(0.95);
-    }
-
-    /* 輔具區滑出 */
-    .slide-up {
-      position: fixed;
-      bottom: -100%;
-      left: 50%;
-      transform: translateX(-50%) translateY(100%);
-      width: 100%;
-      max-width: 420px;
-      background: var(--card);
-      border-radius: 20px 20px 0 0;
-      padding: 20px;
-      box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.15);
-      transition: transform 0.4s ease, bottom 0.4s ease;
-      z-index: 1000;
-    }
-
-    .slide-up.active {
-      bottom: 0;
-      transform: translateX(-50%) translateY(0);
     }
 
     /* 收回叉叉 */
@@ -444,7 +423,9 @@
           <i class="fa-solid fa-angle-left"></i>
         </button>
 
-        <div class="lock-btn" id="lockBtn">🔒</div>
+        <div class="lock-btn" id="lockBtn">
+          <i class="fa-solid fa-lock"></i>
+        </div>
 
         <button class="nav-btn" id="nextBtn" title="下一題">
           <i class="fa-solid fa-angle-right"></i>
@@ -543,8 +524,15 @@
 
   lockBtn.addEventListener("click", () => {
     const unlocked = lockBtn.classList.toggle("active");
-    lockBtn.textContent = unlocked ? "🔓" : "🔒";
-    lockText.textContent = unlocked ? "測驗中" : "點擊開始";
+    const icon = lockBtn.querySelector("i");
+
+    if (unlocked) {
+      icon.classList.replace("fa-lock", "fa-lock-open");
+      lockText.textContent = "測驗中";
+    } else {
+      icon.classList.replace("fa-lock-open", "fa-lock");
+      lockText.textContent = "點擊開始";
+    }
   });
   const toggleAssistBtn = document.getElementById("toggleAssistBtn");
   const assistiveSection = document.getElementById("assistiveSection");
