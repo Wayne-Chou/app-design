@@ -1,0 +1,334 @@
+<!doctype html>
+<html lang="zh-TW">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
+    <title>操作說明</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
+    />
+    <style>
+      :root {
+        --primary: #0d9488;
+        --success: #34c759;
+        --bg: #ffffff;
+        --accent-bg: #e0f7fa;
+        --text-dark: #1a1a1a;
+        --text-gray: #6b7280;
+        --border: #e5e7eb;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+        height: 100%;
+        font-family:
+          "Segoe UI",
+          -apple-system,
+          system-ui,
+          sans-serif;
+        background: var(--bg);
+        color: var(--text-dark);
+        overflow: hidden;
+      }
+
+      #app {
+        height: 100vh;
+        display: flex;
+        flex-direction: column;
+      }
+
+      /* ===== Header ===== */
+      .app-header {
+        padding: 18px 20px 10px;
+        border-bottom: 1px solid var(--border);
+      }
+
+      .app-header h1 {
+        font-size: 18px;
+        margin: 0;
+        font-weight: 700;
+      }
+
+      .progress {
+        margin-top: 10px;
+        height: 4px;
+        background: #e5e7eb;
+        border-radius: 10px;
+        overflow: hidden;
+      }
+
+      .progress-bar {
+        height: 100%;
+        width: 20%;
+        background: var(--primary);
+        transition: 0.3s;
+      }
+
+      /* ===== Content ===== */
+      .content {
+        flex: 1;
+        position: relative;
+      }
+
+      .step-page {
+        position: absolute;
+        inset: 0;
+        padding: 24px 20px 140px;
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+        opacity: 0;
+        pointer-events: none;
+        transition: 0.35s ease;
+      }
+
+      .step-page.active {
+        opacity: 1;
+        pointer-events: auto;
+      }
+
+      .step-title {
+        font-size: 22px;
+        font-weight: 800;
+        color: var(--primary);
+      }
+
+      .step-desc {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 18px;
+        border-radius: 999px;
+        background: var(--accent-bg);
+        color: var(--text-gray);
+        font-weight: 600;
+        font-size: 16px;
+      }
+
+      .step-desc i {
+        color: var(--primary);
+      }
+
+      .img-box {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .img-box img {
+        max-width: 100%;
+        max-height: 100%;
+        object-fit: contain;
+        filter: drop-shadow(0 12px 24px rgba(0, 0, 0, 0.08));
+      }
+
+      /* ===== Bottom Action ===== */
+      .action-layer {
+        position: absolute;
+        bottom: 0;
+        width: 100%;
+        padding: 20px 20px 36px;
+        background: linear-gradient(transparent, #fff 35%);
+      }
+
+      .dots {
+        display: flex;
+        justify-content: center;
+        gap: 8px;
+        margin-bottom: 18px;
+      }
+
+      .dot {
+        width: 6px;
+        height: 6px;
+        background: #d1d5db;
+        border-radius: 999px;
+        transition: 0.3s;
+      }
+
+      .dot.active {
+        width: 20px;
+        background: var(--primary);
+      }
+
+      .nav-btns {
+        display: flex;
+        justify-content: space-between;
+        gap: 12px;
+      }
+
+      .btn {
+        flex: 1;
+        padding: 14px;
+        font-size: 16px;
+        font-weight: 700;
+        border-radius: 14px;
+        border: none;
+        cursor: pointer;
+        transition: 0.2s;
+      }
+
+      .btn-prev {
+        background: #f3f4f6;
+        color: var(--text-gray);
+      }
+
+      .btn-next {
+        background: var(--primary);
+        color: #fff;
+        box-shadow: 0 8px 16px rgba(13, 148, 136, 0.25);
+      }
+
+      .btn:active {
+        transform: scale(0.96);
+      }
+
+      .btn:disabled {
+        opacity: 0;
+        pointer-events: none;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div id="app">
+      <!-- Header -->
+      <div class="app-header">
+        <h1>測驗操作說明</h1>
+        <div class="progress">
+          <div class="progress-bar" id="progressBar"></div>
+        </div>
+      </div>
+
+      <!-- Content -->
+      <div class="content">
+        <div class="step-page active">
+          <div class="step-title">起坐測驗</div>
+          <div class="step-desc">
+            <i class="fa-solid fa-chair"></i>
+            坐於椅子，雙手交叉置於肩上
+          </div>
+          <div class="img-box">
+            <img src="../img/10.jpg" />
+          </div>
+        </div>
+
+        <div class="step-page">
+          <div class="step-title">平衡：雙腳併攏</div>
+          <div class="step-desc">
+            <i class="fa-solid fa-shoe-prints"></i>
+            雙腳併攏站立，保持平衡
+          </div>
+          <div class="img-box">
+            <img src="../img/20.jpg" />
+          </div>
+        </div>
+
+        <div class="step-page">
+          <div class="step-title">平衡：雙腳半併攏</div>
+          <div class="step-desc">
+            <i class="fa-solid fa-shoe-prints"></i>
+            一腳足弓貼另一腳腳跟
+          </div>
+          <div class="img-box">
+            <img src="../img/50.png" />
+          </div>
+        </div>
+
+        <div class="step-page">
+          <div class="step-title">平衡：一直線</div>
+          <div class="step-desc">
+            <i class="fa-solid fa-shoe-prints"></i>
+            一腳腳尖緊貼另一腳腳跟
+          </div>
+          <div class="img-box">
+            <img src="../img/30.jpg" />
+          </div>
+        </div>
+
+        <div class="step-page">
+          <div class="step-title">行走測驗</div>
+          <div class="step-desc">
+            <i class="fa-solid fa-person-walking"></i>
+            沿直線穩定步行
+          </div>
+          <div class="img-box">
+            <img src="../img/40.jpg" />
+          </div>
+        </div>
+      </div>
+
+      <!-- Bottom -->
+      <div class="action-layer">
+        <div class="dots">
+          <div class="dot active"></div>
+          <div class="dot"></div>
+          <div class="dot"></div>
+          <div class="dot"></div>
+          <div class="dot"></div>
+        </div>
+
+        <div class="nav-btns">
+          <button class="btn btn-prev" id="prevBtn" disabled>上一頁</button>
+          <button class="btn btn-next" id="nextBtn">下一頁</button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      let step = 0;
+      const pages = document.querySelectorAll(".step-page");
+      const dots = document.querySelectorAll(".dot");
+      const prevBtn = document.getElementById("prevBtn");
+      const nextBtn = document.getElementById("nextBtn");
+      const progressBar = document.getElementById("progressBar");
+
+      function update() {
+        pages.forEach((p) => p.classList.remove("active"));
+        dots.forEach((d) => d.classList.remove("active"));
+
+        pages[step].classList.add("active");
+        dots[step].classList.add("active");
+
+        prevBtn.disabled = step === 0;
+
+        progressBar.style.width = `${((step + 1) / pages.length) * 100}%`;
+
+        if (step === pages.length - 1) {
+          nextBtn.textContent = "開始測驗";
+          nextBtn.style.background = "var(--success)";
+        } else {
+          nextBtn.textContent = "下一頁";
+          nextBtn.style.background = "var(--primary)";
+        }
+      }
+
+      prevBtn.onclick = () => {
+        if (step > 0) {
+          step--;
+          update();
+        }
+      };
+
+      nextBtn.onclick = () => {
+        if (step < pages.length - 1) {
+          step++;
+          update();
+        } else {
+          alert("進入測驗流程");
+        }
+      };
+    </script>
+  </body>
+</html>

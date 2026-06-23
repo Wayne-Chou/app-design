@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="zh-TW">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>聲明</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <style>
+    :root {
+      --primary: #1fa187;
+      --primary-dark: #178f77;
+      --bg: #f4f7f9;
+      --text: #2f3a4a;
+      --sub-text: #6b7a90;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: "Noto Sans TC", sans-serif;
+    }
+
+    body {
+      background: var(--bg);
+    }
+
+    /* Page */
+    .page {
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+    }
+
+    /* Header */
+    .header {
+      display: flex;
+      align-items: center;
+      padding: 16px 20px;
+      position: relative;
+    }
+
+    .header h1 {
+      flex: 1;
+      text-align: center;
+      font-size: 22px;
+      color: var(--text);
+      font-weight: 600;
+    }
+
+    .back-btn {
+      position: absolute;
+      left: 20px;
+      font-size: 20px;
+      cursor: pointer;
+      color: var(--text);
+    }
+
+    /* Content */
+    .content {
+      flex: 1;
+      padding: 20px;
+    }
+
+    .card {
+      background: #fff;
+      border-radius: 20px;
+      padding: 20px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+      line-height: 1.7;
+      color: var(--text);
+      font-size: 15px;
+    }
+
+    .card p + p {
+      margin-top: 12px;
+    }
+
+    /* Footer */
+    .footer {
+      padding: 20px;
+    }
+
+    /* Button */
+    .confirm-btn {
+      width: 100%;
+      padding: 14px;
+      border: none;
+      border-radius: 999px;
+      font-size: 16px;
+      font-weight: 600;
+      color: #fff;
+      cursor: pointer;
+
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+
+      box-shadow: 0 8px 20px rgba(31, 161, 135, 0.3);
+      transition: 0.2s;
+    }
+
+    .confirm-btn:active {
+      transform: scale(0.97);
+    }
+  </style>
+  <body>
+    <div class="page">
+      <!-- Header -->
+      <div class="header">
+        <div class="back-btn">←</div>
+        <h1>聲明</h1>
+      </div>
+
+      <!-- Content -->
+      <div class="content">
+        <div class="card">
+          <p>
+            感謝您使用由建豐健康科技股份有限公司研發的 AI 動態骨架鑑測 APP。
+            為了提供精準的鑑測服務，本 APP 會請您同意蒐集特定個人資料及錄影，
+            僅作為分析判讀之用。
+          </p>
+
+          <p>
+            除非獲得您的同意，本公司不會將您的個人資料提供給任何第三方。
+            您有權要求查詢、更正或刪除您的個人資料。
+          </p>
+        </div>
+      </div>
+
+      <!-- Button -->
+      <div class="footer">
+        <button class="confirm-btn">確認</button>
+      </div>
+    </div>
+  </body>
+</html>

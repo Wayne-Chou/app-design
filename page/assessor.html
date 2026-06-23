@@ -1,0 +1,528 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <title>現場鑑測模擬</title>
+    <style>
+      body {
+        font-family: "Segoe UI", sans-serif;
+        background: #e0f7fa;
+        margin: 0;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+      }
+      .content {
+        background: #fff;
+        width: 100%;
+        max-width: 480px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+      }
+      .header {
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 12px 16px;
+        background: #0d9488;
+        color: #fff;
+      }
+      .header i {
+        font-size: 20px;
+        cursor: pointer;
+      }
+      .progress-info {
+        width: 100%;
+        text-align: center;
+        font-weight: 600;
+        color: #333;
+        margin: 10px 0 10px 0;
+        font-size: 14px;
+      }
+      .search-box {
+        width: 100%;
+        padding: 0 10px;
+        margin-bottom: 8px;
+      }
+      .filter-group {
+        width: 100%;
+        padding: 0 10px;
+        display: flex;
+        gap: 5px;
+        margin-bottom: 12px;
+      }
+      .filter-btn {
+        flex: 1;
+        padding: 6px;
+        font-size: 13px;
+        border: 1px solid #0d9488;
+        background: #fff;
+        color: #0d9488;
+        border-radius: 4px;
+        transition: all 0.2s;
+      }
+      .filter-btn.active {
+        background: #0d9488;
+        color: #fff;
+      }
+      .person-list {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        max-height: 300px;
+        overflow-y: auto;
+        margin-bottom: 20px;
+        padding: 0 10px;
+      }
+      .person-card {
+        background: #fff;
+        padding: 14px 16px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        cursor: pointer;
+        transition: all 0.2s;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        position: relative;
+      }
+      .person-card.selected {
+        border: 2px solid #0d9488;
+        background: rgba(13, 148, 136, 0.05);
+      }
+      .person-card.completed::after {
+        content: "已完成";
+        position: absolute;
+        top: 8px;
+        right: 8px;
+        font-size: 12px;
+        color: #0d9488;
+        font-weight: 600;
+        background: rgba(13, 148, 136, 0.1);
+        padding: 2px 6px;
+        border-radius: 4px;
+      }
+      .start-btn {
+        width: 100%;
+        padding: 14px;
+        background: #0d9488;
+        color: #fff;
+        font-weight: 600;
+        border: none;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 8px;
+        font-size: 16px;
+      }
+      .start-btn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+      .modal-header i {
+        cursor: pointer;
+      }
+      .design-preview-btn {
+        position: fixed;
+        top: 20px;
+        left: 20px;
+        background: #0d9488;
+        color: #fff;
+        border: none;
+        padding: 8px 14px;
+        border-radius: 10px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        font-size: 14px;
+        z-index: 2000;
+      }
+      .design-preview-btn:active {
+        transform: scale(0.95);
+      }
+      .vertical-info {
+        width: 100%;
+        text-align: center;
+        font-size: 13px;
+        color: #555;
+        margin-bottom: 8px;
+      }
+      .unit-tag {
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 14px;
+        font-weight: 600;
+        color: #065f46;
+        background: #d1fae5;
+        padding: 4px 8px;
+      }
+
+      /* ── 跌倒確認彈窗 ── */
+      #fallCheckModal .modal-dialog {
+        max-width: 360px;
+      }
+      #fallCheckModal .modal-content {
+        border: none;
+        border-radius: 0;
+        overflow: hidden;
+      }
+      .fall-modal-top {
+        background: #0d9488;
+        padding: 20px 24px 20px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 10px;
+        position: relative;
+      }
+      .fall-modal-close {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        background: rgba(255, 255, 255, 0.2);
+        border: none;
+        color: #fff;
+        width: 44px;
+        height: 44px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 20px;
+        cursor: pointer;
+        transition: background 0.2s;
+        padding: 0;
+      }
+      .fall-modal-close:hover {
+        background: rgba(255, 255, 255, 0.32);
+      }
+      .fall-modal-name {
+        font-size: 18px;
+        font-weight: 700;
+        color: #fff;
+        letter-spacing: 0.5px;
+      }
+      .fall-modal-period {
+        font-size: 16px;
+        color: #fff;
+
+        padding: 3px 12px;
+        border-radius: 20px;
+        letter-spacing: 0.5px;
+      }
+      .fall-modal-body {
+        padding: 24px 24px 10px;
+        text-align: center;
+      }
+      .fall-modal-question {
+        font-size: 16px;
+        font-weight: 700;
+        color: #1e293b;
+        line-height: 1.6;
+        margin-bottom: 6px;
+      }
+
+      .fall-modal-actions {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+        padding: 16px 24px 24px;
+      }
+      .fall-btn {
+        padding: 14px 0;
+        border: none;
+
+        font-size: 15px;
+        font-weight: 700;
+        cursor: pointer;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 5px;
+        transition:
+          transform 0.15s,
+          box-shadow 0.15s;
+      }
+      .fall-btn:active {
+        transform: scale(0.96);
+      }
+      .fall-btn i {
+        font-size: 18px;
+      }
+      .fall-btn-yes {
+        background: #fef2f2;
+        color: #dc2626;
+        border: 1.5px solid #fecaca;
+      }
+      .fall-btn-yes:hover {
+        background: #fee2e2;
+        box-shadow: 0 4px 12px rgba(220, 38, 38, 0.15);
+      }
+      .fall-btn-no {
+        background: #0d9488;
+        color: #fff;
+      }
+      .fall-btn-no:hover {
+        background: #0f766e;
+        box-shadow: 0 4px 12px rgba(13, 148, 136, 0.3);
+      }
+      .fall-btn-label {
+        font-size: 13px;
+
+        line-height: 1;
+      }
+    </style>
+  </head>
+  <body>
+    <button
+      class="design-preview-btn"
+      data-bs-toggle="modal"
+      data-bs-target="#designPreviewModal"
+    >
+      對照原始畫面
+    </button>
+
+    <div class="content">
+      <div class="header">
+        <i class="fa-solid fa-arrow-left"></i>
+        <i
+          class="fa-solid fa-user-plus"
+          data-bs-toggle="modal"
+          data-bs-target="#createModal"
+          title="建立身分"
+        ></i>
+      </div>
+
+      <div class="unit-tag">單位：台北榮總復健中心</div>
+
+      <div class="progress-info" id="progressInfo">已完成 2 位 / 共 8 位</div>
+
+      <div class="vertical-info">與地垂直差:50度左右偏移:-0.09</div>
+
+      <div class="search-box">
+        <input
+          type="text"
+          class="form-control"
+          id="searchInput"
+          placeholder="搜尋人員"
+        />
+      </div>
+
+      <div class="filter-group">
+        <button class="filter-btn active" data-filter="all">全部</button>
+        <button class="filter-btn" data-filter="completed">已完成</button>
+        <button class="filter-btn" data-filter="pending">未完成</button>
+      </div>
+
+      <div class="person-list" id="personList">
+        <div class="person-card">王小明</div>
+        <div class="person-card completed">李小華</div>
+        <div class="person-card">陳大華</div>
+        <div class="person-card">林小美</div>
+        <div class="person-card completed">張三</div>
+        <div class="person-card">趙四</div>
+        <div class="person-card">錢五</div>
+        <div class="person-card">孫六</div>
+      </div>
+
+      <button class="start-btn" id="startBtn" disabled>
+        <i class="fa-solid fa-play"></i> 開始
+      </button>
+    </div>
+
+    <!-- 建立人員資料 Modal -->
+    <div class="modal fade" id="createModal" tabindex="-1">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <i class="fa-solid fa-arrow-left" data-bs-dismiss="modal"></i>
+            <h5 class="modal-title ms-2">建立人員資料</h5>
+          </div>
+          <div class="modal-body">
+            <div class="mb-3">
+              <label class="form-label">姓名</label>
+              <input type="text" class="form-control" placeholder="輸入姓名" />
+            </div>
+            <div class="mb-3">
+              <label class="form-label">性別</label>
+              <select class="form-select">
+                <option value="">請選擇性別</option>
+                <option value="male">男</option>
+                <option value="female">女</option>
+              </select>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">生日</label>
+              <input type="date" class="form-control" />
+            </div>
+            <button class="btn btn-primary w-100">建立完成</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 對照原始畫面 Modal -->
+    <div class="modal fade" id="designPreviewModal" tabindex="-1">
+      <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">對照原始畫面</h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+            ></button>
+          </div>
+          <div class="modal-body text-center">
+            <img
+              src="../img/5.jpg"
+              class="img-fluid rounded"
+              alt="Original Design"
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 跌倒確認 Modal -->
+    <div
+      class="modal fade"
+      id="fallCheckModal"
+      tabindex="-1"
+      data-bs-backdrop="static"
+      data-bs-keyboard="false"
+    >
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="fall-modal-top">
+            <button class="fall-modal-close" id="fallCloseBtn">
+              <i class="fa-solid fa-xmark"></i>
+            </button>
+            <div class="fall-modal-name" id="fallModalName">王小明</div>
+            <div class="fall-modal-period">近 6 個月跌倒史確認</div>
+          </div>
+
+          <div class="fall-modal-body">
+            <div class="fall-modal-question">
+              過去半年內，是否曾有<br />跌倒或差點跌倒的情形？
+            </div>
+          </div>
+
+          <div class="fall-modal-actions">
+            <button class="fall-btn fall-btn-yes" id="fallYesBtn">
+              <i class="fa-solid fa-circle-exclamation"></i>
+              有
+              <span class="fall-btn-label">曾跌倒或差點跌倒</span>
+            </button>
+            <button class="fall-btn fall-btn-no" id="fallNoBtn">
+              <i class="fa-solid fa-circle-check"></i>
+              沒有
+              <span class="fall-btn-label">近半年無跌倒紀錄</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+      const personList = document.getElementById("personList");
+      const personCards = personList.querySelectorAll(".person-card");
+      const startBtn = document.getElementById("startBtn");
+      const searchInput = document.getElementById("searchInput");
+      const progressInfo = document.getElementById("progressInfo");
+      const filterBtns = document.querySelectorAll(".filter-btn");
+      const fallModalName = document.getElementById("fallModalName");
+      const fallCheckModal = new bootstrap.Modal(
+        document.getElementById("fallCheckModal"),
+      );
+
+      let currentFilter = "all";
+      let selectedCard = null;
+
+      function filterPeople() {
+        const searchText = searchInput.value.toLowerCase();
+        personCards.forEach((card) => {
+          const name = card.textContent.toLowerCase();
+          const isCompleted = card.classList.contains("completed");
+          const matchesSearch = name.includes(searchText);
+          let matchesTab = false;
+          if (currentFilter === "all") matchesTab = true;
+          else if (currentFilter === "completed") matchesTab = isCompleted;
+          else if (currentFilter === "pending") matchesTab = !isCompleted;
+          card.style.display = matchesSearch && matchesTab ? "flex" : "none";
+        });
+      }
+
+      function selectPerson(card) {
+        personCards.forEach((c) => c.classList.remove("selected"));
+        card.classList.add("selected");
+        selectedCard = card;
+        startBtn.disabled = false;
+      }
+
+      function initProgress() {
+        const completedCount = document.querySelectorAll(
+          ".person-card.completed",
+        ).length;
+        const totalCount = personCards.length;
+        progressInfo.textContent = `已完成 ${completedCount} 位 / 共 ${totalCount} 位`;
+      }
+
+      startBtn.addEventListener("click", () => {
+        if (!selectedCard) return;
+        const rawText = selectedCard.innerText.replace("已完成", "").trim();
+        fallModalName.textContent = rawText;
+        fallCheckModal.show();
+      });
+
+      document.getElementById("fallCloseBtn").addEventListener("click", () => {
+        fallCheckModal.hide();
+      });
+
+      document.getElementById("fallYesBtn").addEventListener("click", () => {
+        fallCheckModal.hide();
+        alert(
+          `${fallModalName.textContent}：已記錄近半年有跌倒史，繼續進入鑑測。`,
+        );
+      });
+
+      document.getElementById("fallNoBtn").addEventListener("click", () => {
+        fallCheckModal.hide();
+        alert(`${fallModalName.textContent}：無跌倒史，繼續進入鑑測。`);
+      });
+
+      personCards.forEach((card) => {
+        card.addEventListener("click", () => selectPerson(card));
+      });
+
+      searchInput.addEventListener("input", filterPeople);
+
+      filterBtns.forEach((btn) => {
+        btn.addEventListener("click", () => {
+          filterBtns.forEach((b) => b.classList.remove("active"));
+          btn.classList.add("active");
+          currentFilter = btn.dataset.filter;
+          filterPeople();
+        });
+      });
+
+      initProgress();
+    </script>
+  </body>
+</html>

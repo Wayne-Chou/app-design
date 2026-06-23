@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <title>鑑測日期上傳</title>
+
+    <style>
+      body {
+        font-family: "Segoe UI", sans-serif;
+        background: #e0f7fa;
+        margin: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+      }
+
+      .content {
+        background: #fff;
+        width: 100%;
+        max-width: 480px;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .header {
+        display: flex;
+        align-items: center;
+        padding: 12px 16px;
+        background: #0d9488;
+        color: #fff;
+        gap: 12px;
+      }
+
+      .header i {
+        font-size: 20px;
+        cursor: pointer;
+      }
+
+      .title {
+        font-weight: 600;
+        font-size: 16px;
+      }
+
+      .info {
+        text-align: center;
+        font-size: 14px;
+        color: #333;
+        margin: 12px 0;
+        font-weight: 600;
+      }
+
+      .date-list {
+        padding: 0 12px 16px;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        max-height: 320px;
+        overflow-y: auto;
+      }
+
+      .date-card {
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        padding: 14px 16px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .upload-btn {
+        background: #0d9488;
+        color: #fff;
+        border: none;
+        padding: 6px 14px;
+        border-radius: 6px;
+        font-size: 14px;
+      }
+
+      .upload-btn.done {
+        background: #198754;
+        cursor: default;
+      }
+
+      .upload-btn.retry {
+        background: #dc3545;
+      }
+
+      .upload-btn:disabled {
+        opacity: 0.9;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="content">
+      <div class="header">
+        <i class="fa-solid fa-arrow-left"></i>
+        <div class="title">鑑測日期上傳</div>
+      </div>
+
+      <div class="info">共 3 筆鑑測日期</div>
+
+      <div class="date-list">
+        <div class="date-card">
+          <div>2024 / 10 / 12</div>
+          <button
+            class="upload-btn"
+            data-date="2024 / 10 / 12"
+            data-bs-toggle="modal"
+            data-bs-target="#uploadModal"
+          >
+            上傳
+          </button>
+        </div>
+
+        <div class="date-card">
+          <div>2024 / 10 / 05</div>
+          <button
+            class="upload-btn"
+            data-date="2024 / 10 / 05"
+            data-bs-toggle="modal"
+            data-bs-target="#uploadModal"
+          >
+            上傳
+          </button>
+        </div>
+
+        <div class="date-card">
+          <div>2024 / 09 / 28</div>
+          <button
+            class="upload-btn"
+            data-date="2024 / 09 / 28"
+            data-bs-toggle="modal"
+            data-bs-target="#uploadModal"
+          >
+            上傳
+          </button>
+        </div>
+      </div>
+
+      <!-- <div class="demo-box">
+        <div class="title">上傳進度條 Demo</div>
+
+        
+        <div class="progress">
+          <div
+            class="progress-bar progress-bar-striped progress-bar-animated"
+            style="width: 25%"
+          >
+            25%
+          </div>
+        </div>
+      </div> -->
+    </div>
+
+    <!-- 上傳 Modal -->
+    <div class="modal fade" id="uploadModal" tabindex="-1">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">上傳鑑測資料</h5>
+            <button class="btn-close" data-bs-dismiss="modal"></button>
+          </div>
+
+          <div class="modal-body text-center">
+            <div class="fw-semibold mb-2">
+              鑑測日期：<span id="uploadDateText">----</span>
+            </div>
+
+            <div class="progress mb-3 d-none" id="uploadProgressBox">
+              <div
+                class="progress-bar progress-bar-striped progress-bar-animated"
+                id="uploadProgress"
+                style="width: 0%"
+              >
+                0%
+              </div>
+            </div>
+
+            <div
+              class="text-success fw-semibold mb-2 d-none"
+              id="uploadSuccessText"
+            >
+              <i class="fa-solid fa-circle-check me-1"></i>上傳完成
+            </div>
+
+            <div
+              class="text-danger fw-semibold mb-2 d-none"
+              id="uploadFailText"
+            >
+              <i class="fa-solid fa-circle-xmark me-1"></i>
+              上傳失敗，請重新上傳
+            </div>
+
+            <button class="btn btn-success w-100" id="startUploadBtn">
+              <i class="fa-solid fa-upload me-2"></i>開始上傳
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+      const uploadDateText = document.getElementById("uploadDateText");
+      const progressBox = document.getElementById("uploadProgressBox");
+      const progressBar = document.getElementById("uploadProgress");
+      const startUploadBtn = document.getElementById("startUploadBtn");
+      const successText = document.getElementById("uploadSuccessText");
+      const failText = document.getElementById("uploadFailText");
+
+      let currentBtn = null;
+      let timer = null;
+      let currentDate = "";
+
+      document.querySelectorAll(".upload-btn").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          currentDate = btn.dataset.date;
+          uploadDateText.textContent = currentDate;
+          currentBtn = btn;
+
+          progressBox.classList.add("d-none");
+          successText.classList.add("d-none");
+          failText.classList.add("d-none");
+          progressBar.style.width = "0%";
+          progressBar.textContent = "0%";
+          startUploadBtn.disabled = false;
+        });
+      });
+
+      startUploadBtn.addEventListener("click", () => {
+        let progress = 0;
+        startUploadBtn.disabled = true;
+        progressBox.classList.remove("d-none");
+
+        const willFail = currentDate === "2024 / 10 / 05";
+
+        timer = setInterval(() => {
+          progress += Math.floor(Math.random() * 15) + 5;
+          if (progress >= (willFail ? 65 : 100)) progress = willFail ? 65 : 100;
+
+          progressBar.style.width = progress + "%";
+          progressBar.textContent = progress + "%";
+
+          if (progress === (willFail ? 65 : 100)) {
+            clearInterval(timer);
+            progressBox.classList.add("d-none");
+
+            if (willFail) {
+              failText.classList.remove("d-none");
+              currentBtn.textContent = "重新上傳";
+              currentBtn.classList.add("retry");
+              currentBtn.disabled = false;
+            } else {
+              successText.classList.remove("d-none");
+              currentBtn.textContent = "✔ 上傳完成";
+              currentBtn.classList.add("done");
+              currentBtn.disabled = true;
+
+              setTimeout(() => {
+                bootstrap.Modal.getInstance(
+                  document.getElementById("uploadModal")
+                ).hide();
+              }, 800);
+            }
+          }
+        }, 300);
+      });
+    </script>
+  </body>
+</html>

@@ -1,8 +1,10 @@
-<!DOCTYPE html>
-<html lang="en">
+<!doctype html>
+<html lang="zh-TW">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>行走測驗 App（起坐/平衡/行走｜加入使用者姓名）</title>
+
     <link
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
@@ -12,575 +14,980 @@
       rel="stylesheet"
     />
 
-    <title>app介面設計</title>
+    <style>
+      :root {
+        --text: #111827;
+        --muted: #6b7280;
+
+        --primary: #0d9488;
+        --success: #22c55e;
+        --warning: #f97316;
+
+        --glass: rgba(255, 255, 255, 0.88);
+        --shadow: 0 10px 25px rgba(0, 0, 0, 0.18);
+      }
+
+      /* [新增] 使用者資訊標籤樣式 */
+      .user-tag {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        background: rgba(255, 255, 255, 0.15);
+        padding: 2px 12px;
+        border-radius: 999px;
+        font-size: 13px;
+        color: #5eead4; /* 淺綠色，易於閱讀 */
+        font-weight: 700;
+        margin-bottom: 6px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        font-family: "Segoe UI", "Microsoft JhengHei", sans-serif;
+        color: var(--text);
+        overflow: hidden;
+        background: #000;
+      }
+
+      .camera-layer {
+        position: fixed;
+        inset: 0;
+        z-index: 0;
+        background: radial-gradient(circle at 50% 40%, #2d2d2d, #0b0b0b);
+      }
+
+      .camera-viewport {
+        position: fixed;
+        top: 0;
+        bottom: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        width: min(380px, 56vw);
+        z-index: 1;
+        background: rgba(255, 255, 255, 0.02);
+        outline: 1px solid rgba(255, 255, 255, 0.06);
+      }
+
+      .side-dim {
+        position: fixed;
+        top: 0;
+        bottom: 0;
+        width: calc((100vw - min(380px, 56vw)) / 2);
+        background: rgba(180, 180, 180, 0.35);
+        z-index: 1;
+        pointer-events: none;
+      }
+      .side-dim.left {
+        left: 0;
+      }
+      .side-dim.right {
+        right: 0;
+      }
+
+      .top-bar {
+        position: fixed;
+        top: 10px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: min(520px, 94vw);
+        z-index: 10;
+        padding: 10px 14px;
+        background: rgba(0, 0, 0, 0.55);
+        color: #fff;
+        border-radius: 14px;
+        text-align: center;
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        box-shadow: var(--shadow);
+        line-height: 1.2;
+      }
+      .top-bar .title {
+        font-weight: 900;
+        font-size: 15px;
+        letter-spacing: 0.4px;
+      }
+      .top-bar .sub {
+        margin-top: 4px;
+        font-size: 13px;
+        opacity: 0.92;
+      }
+
+      .guide {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: min(340px, 56vw);
+        height: min(320px, 78vh);
+        z-index: 8;
+        pointer-events: none;
+      }
+
+      .guide .frame {
+        position: absolute;
+        inset: 0;
+        border: 2px solid rgba(13, 148, 136, 0.65);
+        border-radius: 18px;
+        box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.18);
+      }
+
+      .ghost-hint {
+        position: absolute;
+        inset: 0;
+        display: grid;
+        place-items: center;
+        opacity: 0.26;
+        filter: drop-shadow(0 16px 40px rgba(0, 0, 0, 0.35));
+      }
+
+      .ghost-hint .big-icon {
+        font-size: 140px;
+        color: rgba(255, 255, 255, 0.96);
+      }
+
+      .balance-icon {
+        width: 240px;
+        height: 180px;
+        display: none;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .balance-stage {
+        position: relative;
+        width: 240px;
+        height: 180px;
+      }
+
+      .bal-foot {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        font-size: 130px;
+        color: rgba(245, 189, 68, 0.95);
+        filter: drop-shadow(0 16px 30px rgba(0, 0, 0, 0.45));
+        transform-origin: 50% 50%;
+      }
+
+      #balIcon1 .foot-a {
+        transform: rotate(87deg);
+      }
+      #balIcon2 .foot-a {
+        transform: translate(-88%, -52%) rotate(-16deg) scale(1);
+      }
+      #balIcon3 .foot-a {
+        transform: translate(-70%, -18%) rotate(-10deg) scale(0.98);
+      }
+
+      .side-controls {
+        position: fixed;
+        top: 50%;
+        transform: translateY(-50%);
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+        z-index: 20;
+        padding: 10px;
+      }
+      .side-controls.left {
+        left: 10px;
+      }
+      .side-controls.right {
+        right: 10px;
+      }
+
+      .fab-wrap {
+        position: relative;
+        display: flex;
+        justify-content: center;
+      }
+
+      .fab {
+        width: 54px;
+        height: 54px;
+        border: 0;
+        border-radius: 999px;
+        background: var(--glass);
+        color: var(--text);
+        box-shadow: var(--shadow);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 18px;
+        cursor: pointer;
+        transition:
+          transform 0.15s ease,
+          background 0.15s ease;
+        user-select: none;
+      }
+      .fab:active {
+        transform: scale(0.92);
+      }
+
+      .fab-primary {
+        background: rgba(13, 148, 136, 0.92);
+        color: #fff;
+      }
+      .fab-success {
+        background: rgba(34, 197, 94, 0.92);
+        color: #fff;
+      }
+      .fab-warning {
+        background: rgba(249, 115, 22, 0.92);
+        color: #fff;
+      }
+      .fab-ghost {
+        background: rgba(255, 255, 255, 0.78);
+      }
+
+      .fab-big {
+        width: 74px;
+        height: 74px;
+        font-size: 22px;
+      }
+
+      .mini-label {
+        position: absolute;
+        transform: translateY(46px);
+        font-size: 11px;
+        color: rgba(255, 255, 255, 0.92);
+        background: rgba(0, 0, 0, 0.55);
+        padding: 4px 8px;
+        border-radius: 999px;
+        white-space: nowrap;
+        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.18);
+        pointer-events: none;
+      }
+
+      .bottom-hint {
+        position: fixed;
+        bottom: 14px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: min(520px, 94vw);
+        z-index: 15;
+        display: flex;
+      }
+
+      .pill {
+        width: 100%;
+        padding: 10px 14px;
+        border-radius: 16px;
+        background: rgba(0, 0, 0, 0.55);
+        color: #fff;
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        box-shadow: var(--shadow);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+      }
+      .pill .left {
+        display: flex;
+        flex-direction: column;
+        line-height: 1.2;
+      }
+      .pill .left .k {
+        font-size: 12px;
+        opacity: 0.9;
+      }
+      .pill .left .v {
+        font-size: 14px;
+        font-weight: 900;
+      }
+
+      .slide-up {
+        position: fixed;
+        bottom: -100%;
+        left: 50%;
+        transform: translateX(-50%);
+        width: min(420px, 96vw);
+        background: rgba(255, 255, 255, 0.96);
+        padding: 26px 18px 22px;
+        border-radius: 26px 26px 0 0;
+        box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.25);
+        transition: bottom 0.35s ease;
+        z-index: 2000;
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+      }
+      .slide-up.active {
+        bottom: 0;
+      }
+
+      .sheet-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 16px;
+      }
+      .sheet-header h3 {
+        font-size: 16px;
+        margin: 0;
+        font-weight: 900;
+      }
+      .close-btn {
+        border: 0;
+        background: transparent;
+        font-size: 20px;
+        color: #9ca3af;
+        cursor: pointer;
+      }
+
+      .assistive-buttons {
+        display: flex;
+        gap: 12px;
+        justify-content: center;
+        margin-bottom: 16px;
+      }
+      .assistive-btn {
+        flex: 1;
+        padding: 14px 10px;
+        border: 2px solid #e5e7eb;
+        border-radius: 16px;
+        background: #fff;
+        cursor: pointer;
+        transition: 0.18s ease;
+        font-weight: 900;
+      }
+      .assistive-btn i {
+        font-size: 26px;
+        display: block;
+        margin-bottom: 6px;
+      }
+      .assistive-btn.active {
+        border-color: var(--primary);
+        color: var(--primary);
+        background: rgba(13, 148, 136, 0.08);
+      }
+
+      .switch-container {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 12px 14px;
+        border-radius: 16px;
+        background: rgba(17, 24, 39, 0.06);
+        color: #374151;
+        font-weight: 800;
+      }
+      .switch {
+        position: relative;
+        width: 52px;
+        height: 28px;
+      }
+      .switch input {
+        display: none;
+      }
+      .slider {
+        position: absolute;
+        cursor: pointer;
+        inset: 0;
+        background: #cfd4dc;
+        border-radius: 999px;
+        transition: 0.25s;
+      }
+      .slider:before {
+        position: absolute;
+        content: "";
+        height: 20px;
+        width: 20px;
+        left: 4px;
+        bottom: 4px;
+        background: #fff;
+        border-radius: 50%;
+        transition: 0.25s;
+        box-shadow: 0 6px 14px rgba(0, 0, 0, 0.12);
+      }
+      input:checked + .slider {
+        background: var(--primary);
+      }
+      input:checked + .slider:before {
+        transform: translateX(24px);
+      }
+
+      .tutorial {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.6);
+        z-index: 2500;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        padding: 18px;
+      }
+      .tutorial.active {
+        display: flex;
+      }
+      .tutorial-card {
+        width: min(440px, 96vw);
+        background: rgba(255, 255, 255, 0.96);
+        border-radius: 22px;
+        padding: 18px 16px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.32);
+      }
+      .tutorial-card h4 {
+        margin: 0 0 10px;
+        font-size: 16px;
+        font-weight: 900;
+      }
+      .steps {
+        margin: 0;
+        padding-left: 18px;
+        color: #374151;
+        font-weight: 800;
+        line-height: 1.6;
+        font-size: 14px;
+      }
+      .tutorial-actions {
+        margin-top: 14px;
+        display: flex;
+        gap: 10px;
+      }
+      .tutorial-actions button {
+        flex: 1;
+      }
+
+      .confirm-modal {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.55);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 3000;
+      }
+      .confirm-box {
+        background: rgba(255, 255, 255, 0.96);
+        padding: 22px;
+        border-radius: 20px;
+        width: min(340px, 90vw);
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      }
+
+      @media (max-width: 420px) {
+        .side-controls.left {
+          left: 6px;
+        }
+        .side-controls.right {
+          right: 6px;
+        }
+        .camera-viewport {
+          width: min(340px, 62vw);
+        }
+        .fab {
+          width: 50px;
+          height: 50px;
+        }
+        .fab-big {
+          width: 70px;
+          height: 70px;
+        }
+        .mini-label {
+          transform: translateY(44px);
+        }
+        .ghost-hint .big-icon {
+          font-size: 120px;
+        }
+        .balance-icon {
+          width: 210px;
+          height: 160px;
+        }
+        .balance-stage {
+          width: 210px;
+          height: 160px;
+        }
+        .bal-foot {
+          font-size: 115px;
+        }
+      }
+
+      /* 隱藏起坐/行走的大 icon */
+      #ghostBigIcon {
+        display: none !important;
+      }
+      #balIcon1,
+      #balIcon2,
+      #balIcon3 {
+        display: none !important;
+      }
+    </style>
   </head>
-  <style>
-    :root {
-      --bg: #e0f7fa;
-      --card: #ffffff;
-      --text: #1a1a1a;
-      --muted: #555;
-      --primary: #0d9488;
-      --primary-dark: #056d63;
-      --success: #22c55e;
-      --warning: #f97316;
-      --border: #b2dfdb;
-    }
 
-    body {
-      font-family: "Segoe UI", sans-serif;
-      background: var(--bg);
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      margin: 0;
-      color: var(--text);
-    }
-
-    /* 卡片容器 */
-    .app-container {
-      width: 100%;
-      max-width: 420px;
-      background: var(--card);
-
-      padding: 30px;
-      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
-      text-align: center;
-      position: relative;
-      transition: transform 0.2s;
-    }
-
-    /* 離開按鈕 */
-    .exit-btn {
-      position: absolute;
-      top: 0;
-      left: 0;
-      background: var(--warning);
-      color: #fff;
-      border: none;
-      border-radius: 50%;
-      width: 42px;
-      height: 42px;
-      font-size: 22px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
-    }
-    .exit-btn:active {
-      transform: scale(0.92);
-      background: #d65d0a;
-    }
-
-    /* 提示文字 */
-    .instruction {
-      font-size: 15px;
-      color: var(--muted);
-      margin-bottom: 24px;
-      font-weight: 600;
-    }
-
-    /* 鎖頭與箭頭區 */
-    .lock-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 14px;
-    }
-
-    /* 左右箭頭按鈕 */
-    .nav-btn {
-      width: 64px;
-      height: 64px;
-      border-radius: 16px;
-      background: #ffffff;
-      border: 2px solid var(--primary);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: var(--primary);
-      font-size: 28px;
-      cursor: pointer;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-      transition: all 0.2s;
-    }
-    .nav-btn:active {
-      background: var(--primary);
-      color: #fff;
-      transform: scale(0.93);
-    }
-
-    /* 鎖頭 */
-    .lock-btn {
-      width: 110px;
-      height: 110px;
-      border-radius: 55px;
-      display: flex;
-
-      align-items: center;
-      justify-content: center;
-      background: #a7ffeb;
-      color: var(--text);
-      font-size: 38px;
-      cursor: pointer;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-      transition: all 0.2s;
-    }
-    .lock-btn.active {
-      background: var(--success);
-      color: #fff;
-    }
-    .lock-btn.finished {
-      background: var(--primary);
-      color: #fff;
-    }
-
-    .lock-text {
-      margin-top: 8px;
-      font-size: 15px;
-      color: var(--muted);
-    }
-
-    /* 輔具區 */
-    .assistive-section {
-      margin-top: 26px;
-
-      padding-top: 18px;
-    }
-
-    .assistive-buttons {
-      display: flex;
-      gap: 20px;
-      justify-content: center;
-      margin-bottom: 16px;
-    }
-    .assistive-btn {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      width: 110px;
-      padding: 14px;
-      border-radius: 20px;
-      border: 2px solid var(--primary);
-      background: #ffffff;
-      color: var(--primary);
-      cursor: pointer;
-      transition: all 0.2s;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
-    }
-    .assistive-btn i {
-      font-size: 34px;
-      margin-bottom: 6px;
-    }
-    .assistive-btn.active {
-      background: var(--primary);
-      color: #fff;
-      box-shadow: 0 6px 14px rgba(0, 0, 0, 0.15);
-    }
-    .assistive-btn:active {
-      transform: scale(0.95);
-    }
-    /* 初始滑入樣式 */
-    .slide-up {
-      position: fixed;
-      bottom: -100%;
-      left: 50%;
-      transform: translateX(-50%) translateY(100%);
-      width: 100%;
-      max-width: 420px;
-      background: var(--card);
-
-      padding: 20px;
-      box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.15);
-      transition: transform 0.4s ease, bottom 0.4s ease;
-      z-index: 1000;
-    }
-
-    .slide-up.active {
-      bottom: 0;
-      transform: translateX(-50%) translateY(0);
-    }
-
-    /* 開關 */
-    .switch-container {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      gap: 12px;
-      font-size: 15px;
-      color: var(--muted);
-    }
-    .switch {
-      position: relative;
-      width: 50px;
-      height: 28px;
-    }
-    .switch input {
-      display: none;
-    }
-    .slider {
-      position: absolute;
-      inset: 0;
-      background: #cce7e4;
-      border-radius: 999px;
-    }
-    .slider::after {
-      content: "";
-      position: absolute;
-      top: 3px;
-      left: 3px;
-      width: 22px;
-      height: 22px;
-      border-radius: 50%;
-      background: #fff;
-      transition: 0.2s;
-    }
-    .switch input:checked + .slider {
-      background: var(--primary);
-    }
-    .switch input:checked + .slider::after {
-      transform: translateX(22px);
-    }
-
-    /* 確認視窗 */
-    .confirm-modal {
-      position: fixed;
-      inset: 0;
-      display: none;
-      align-items: center;
-      justify-content: center;
-      background: rgba(0, 0, 0, 0.38);
-    }
-    .confirm-box {
-      width: 92%;
-      max-width: 340px;
-      background: var(--card);
-      padding: 24px;
-      border-radius: 18px;
-      text-align: center;
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
-    }
-    .confirm-box p {
-      margin-bottom: 18px;
-      font-size: 16px;
-      color: var(--text);
-    }
-    .confirm-box button {
-      padding: 10px 16px;
-      border-radius: 12px;
-      border: none;
-      font-size: 15px;
-      cursor: pointer;
-      margin: 0 8px;
-      transition: all 0.2s;
-    }
-    .btn-yes {
-      background: var(--primary);
-      color: #fff;
-    }
-    .btn-no {
-      background: #efefef;
-      color: var(--muted);
-    }
-    .btn-yes:active {
-      background: var(--primary-dark);
-      transform: scale(0.95);
-    }
-    .btn-no:active {
-      background: #d6d6d6;
-      transform: scale(0.95);
-    }
-    /* 按鈕通用樣式 */
-    .top-btn {
-      width: 42px;
-      height: 42px;
-      border: none;
-      border-radius: 12px;
-      color: #fff;
-      font-size: 20px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
-      transition: all 0.2s;
-    }
-    .top-btn:active {
-      transform: scale(0.9);
-    }
-
-    .reset-btn {
-      background: #0d9488;
-    }
-    .reset-btn:active {
-      background: #056d63;
-    }
-
-    .camera-btn {
-      background: #22c55e;
-    }
-    .camera-btn:active {
-      background: #15803d;
-    }
-
-    .img {
-      display: none;
-    }
-
-    .design-preview-btn {
-      position: fixed;
-      top: 20px;
-      left: 20px;
-      background: #0d9488;
-      color: #fff;
-      border: none;
-      padding: 8px 14px;
-      border-radius: 10px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-      font-size: 14px;
-      z-index: 2000;
-    }
-    .design-preview-btn:active {
-      transform: scale(0.95);
-    }
-    /* 小型觸發按鈕 */
-    .assistive-btn-small {
-      padding: 8px 16px;
-      font-size: 14px;
-
-      border: 2px solid var(--primary);
-      background: #fff;
-      color: var(--primary);
-      cursor: pointer;
-      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
-      transition: all 0.2s;
-    }
-    .assistive-btn-small:hover {
-      background: var(--primary);
-      color: #fff;
-    }
-    .assistive-btn-small:active {
-      transform: scale(0.95);
-    }
-
-    /* 收回叉叉 */
-    .close-btn {
-      position: absolute;
-      top: 12px;
-      right: 12px;
-      background: #efefef;
-      border: none;
-      border-radius: 50%;
-      width: 30px;
-      height: 30px;
-      font-size: 18px;
-      cursor: pointer;
-      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
-      transition: all 0.2s;
-    }
-    .close-btn:hover {
-      background: #d6d6d6;
-    }
-    .close-btn:active {
-      transform: scale(0.9);
-    }
-    @keyframes pulse-lock {
-      0%,
-      100% {
-        transform: scale(1);
-      }
-      50% {
-        transform: scale(1.08);
-      }
-    }
-    .lock-btn.pulse {
-      animation: pulse-lock 1s infinite;
-    }
-  </style>
   <body>
-    <button
-      class="design-preview-btn"
-      data-bs-toggle="modal"
-      data-bs-target="#designPreviewModal"
-    >
-      對照原始畫面
-    </button>
+    <div class="camera-layer" id="cameraLayer"></div>
 
-    <div class="app-container">
-      <!-- 離開按鈕 -->
-      <button class="exit-btn" id="exitBtn" title="離開測驗">⏻</button>
+    <div class="side-dim left"></div>
+    <div class="side-dim right"></div>
+    <div class="camera-viewport"></div>
 
-      <!-- 提示 -->
-      <div class="instruction">請確認環境安全後，點擊鎖頭開始測驗</div>
+    <div class="top-bar">
+      <div class="user-tag">
+        <i class="fa-solid fa-user-circle"></i>
+        <span id="userNameDisplay">受測者姓名</span>
+      </div>
+      <div class="title" id="stageTitle">起坐測驗</div>
+      <div class="sub" id="stageSub">總共 5 次｜已完成 0 / 5</div>
+    </div>
 
-      <!-- 鎖頭與左右箭頭 -->
-      <div class="lock-row">
-        <button class="nav-btn" id="prevBtn" title="上一題">
+    <div class="guide" aria-hidden="true">
+      <div class="frame"></div>
+      <div class="ghost-hint" id="ghostHint">
+        <i class="fa-solid fa-chair big-icon" id="ghostBigIcon"></i>
+        <div id="balIcon1" class="balance-icon" aria-hidden="true">
+          <div class="balance-stage">
+            <i class="fa-solid fa-shoe-prints bal-foot foot-a"></i>
+          </div>
+        </div>
+        <div id="balIcon2" class="balance-icon" aria-hidden="true">
+          <div class="balance-stage">
+            <i class="fa-solid fa-shoe-prints bal-foot foot-a"></i>
+          </div>
+        </div>
+        <div id="balIcon3" class="balance-icon" aria-hidden="true">
+          <div class="balance-stage">
+            <i class="fa-solid fa-shoe-prints bal-foot foot-a"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-controls left">
+      <div class="fab-wrap">
+        <button class="fab fab-ghost" id="prevBtn" title="上一關">
           <i class="fa-solid fa-angle-left"></i>
         </button>
-
-        <div class="lock-btn" id="lockBtn">
-          <i class="fa-solid fa-lock"></i>
-        </div>
-
-        <button class="nav-btn" id="nextBtn" title="下一題">
-          <i class="fa-solid fa-angle-right"></i>
-        </button>
+        <div class="mini-label">上一關</div>
       </div>
-
-      <div class="lock-text" id="lockText">點擊開始</div>
-
-      <!-- 輔具觸發按鈕 -->
-      <div
-        class="assistive-toggle-container"
-        style="text-align: center; margin-top: 16px"
-      >
-        <button id="toggleAssistBtn" class="assistive-btn-small">
-          是否使用輔具
+      <div class="fab-wrap">
+        <button class="fab fab-ghost" id="helpBtn" title="教學">
+          <i class="fa-solid fa-circle-question"></i>
         </button>
+        <div class="mini-label">教學</div>
       </div>
-
-      <!-- 輔具選擇區 (初始隱藏) -->
-      <div class="assistive-section slide-up" id="assistiveSection">
-        <!-- 收回叉叉 -->
-        <button id="closeAssistBtn" class="close-btn">✕</button>
-
-        <div class="assistive-buttons">
-          <button class="assistive-btn active" id="assistNo">
-            <i class="fa-solid fa-person-walking"></i>
-            <span>無輔具</span>
-          </button>
-          <button class="assistive-btn" id="assistYes">
-            <i class="fa-solid fa-person-cane"></i>
-            <span>有輔具</span>
-          </button>
-        </div>
-        <div class="switch-container">
-          <label>輔助模式</label>
-          <label class="switch">
-            <input type="checkbox" id="assistSwitch" />
-            <span class="slider"></span>
-          </label>
-        </div>
+      <div class="fab-wrap">
+        <button class="fab fab-warning" id="exitBtn" title="離開">
+          <i class="fa-solid fa-power-off"></i>
+        </button>
+        <div class="mini-label">離開</div>
       </div>
     </div>
-    <div class="mt-4">
-      <p>相機以及重新開始樣式,對應圈起來的icon</p>
-      <div class="d-flex gap-2">
-        <!-- 🔄 重新開始 -->
-        <button class="top-btn reset-btn" title="重新開始">
+
+    <div class="side-controls right">
+      <div class="fab-wrap">
+        <button class="fab fab-primary" id="resetBtn" title="重置">
           <i class="fa-solid fa-rotate-right"></i>
         </button>
-
-        <!-- 📷 相機 -->
-        <button class="top-btn camera-btn" title="相機">
-          <i class="fa-solid fa-camera"></i>
+        <div class="mini-label">重置</div>
+      </div>
+      <div class="fab-wrap">
+        <button class="fab fab-ghost" id="assistBtn" title="輔具">
+          <i class="fa-solid fa-wheelchair-move"></i>
         </button>
+        <div class="mini-label">輔具</div>
+      </div>
+      <div class="fab-wrap">
+        <button
+          class="fab fab-big fab-success"
+          id="startBtn"
+          title="開始/暫停/完成"
+        >
+          <i class="fa-solid fa-play" id="startIcon"></i>
+        </button>
+        <div class="mini-label" id="startLabel">開始</div>
+      </div>
+      <div class="fab-wrap">
+        <button class="fab fab-ghost" id="nextBtn" title="下一關">
+          <i class="fa-solid fa-angle-right"></i>
+        </button>
+        <div class="mini-label">下一關</div>
       </div>
     </div>
 
-    <!-- 離開確認框 -->
-    <div class="confirm-modal" id="confirmModal">
-      <div class="confirm-box">
-        <p>確定要離開測驗嗎？</p>
-        <button class="btn-yes" id="confirmYes">是</button>
-        <button class="btn-no" id="confirmNo">否</button>
-      </div>
-    </div>
-
-    <div class="modal fade" id="designPreviewModal" tabindex="-1">
-      <div class="modal-dialog modal-dialog-centered modal-lg">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title">對照原始畫面</h5>
-            <button
-              type="button"
-              class="btn-close"
-              data-bs-dismiss="modal"
-            ></button>
-          </div>
-          <div class="modal-body text-center">
-            <img src="../img/8.jpg" class="img-fluid rounded" alt="" />
-          </div>
+    <div class="bottom-hint">
+      <div class="pill">
+        <div class="left">
+          <div class="k">狀態</div>
+          <div class="v" id="statusText">待機中｜請站到定位位置</div>
+        </div>
+        <div style="font-size: 12px; opacity: 0.92">
+          <i class="fa-solid fa-person-walking"></i>
+          <span id="assistBadge">無輔具</span>
         </div>
       </div>
     </div>
+
+    <div class="slide-up" id="assistiveSection">
+      <div class="sheet-header">
+        <h3>是否使用輔具</h3>
+        <button id="closeAssistBtn" class="close-btn" aria-label="關閉">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <div class="assistive-buttons">
+        <button class="assistive-btn active" id="assistNo">
+          <i class="fa-solid fa-person-walking"></i>無輔具
+        </button>
+        <button class="assistive-btn" id="assistYes">
+          <i class="fa-solid fa-person-cane"></i>有輔具
+        </button>
+      </div>
+      <div class="switch-container">
+        <span>輔助模式</span>
+        <label class="switch">
+          <input type="checkbox" id="assistSwitch" />
+          <span class="slider"></span>
+        </label>
+      </div>
+    </div>
+
+    <div class="tutorial" id="tutorial">
+      <div class="tutorial-card">
+        <h4>測驗流程</h4>
+        <ol class="steps">
+          <li><b>起坐</b>：共 5 次</li>
+          <li><b>平衡</b>：三個姿勢各 10 秒倒數</li>
+          <li><b>行走</b>：開始後往前走，進入綠色區塊完成</li>
+          <li>左右箭頭為<b>上一關 / 下一關</b></li>
+        </ol>
+        <div class="tutorial-actions">
+          <button class="btn btn-success" id="tutorialOk">知道了</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="confirm-modal" id="confirmModal">
+      <div class="confirm-box">
+        <p style="font-size: 16px; font-weight: 900; margin-bottom: 16px">
+          確定要離開測驗嗎？
+        </p>
+        <p style="font-size: 13px; color: #6b7280; margin-bottom: 18px">
+          離開後本次測驗將不會被保存。
+        </p>
+        <div class="d-flex gap-2">
+          <button class="btn btn-light flex-grow-1" id="confirmNo">否</button>
+          <button class="btn btn-danger flex-grow-1" id="confirmYes">是</button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // ====== [新增] 模擬已知的用戶資訊 (請依實際情況修改此變數)
+      const KNOWN_USER_NAME = "王大明";
+
+      // ====== Elements
+      const stageTitle = document.getElementById("stageTitle");
+      const stageSub = document.getElementById("stageSub");
+      const statusText = document.getElementById("statusText");
+      const assistBadge = document.getElementById("assistBadge");
+      const userNameDisplay = document.getElementById("userNameDisplay"); // [新增]
+
+      const ghostBigIcon = document.getElementById("ghostBigIcon");
+      const balIcon1 = document.getElementById("balIcon1");
+      const balIcon2 = document.getElementById("balIcon2");
+      const balIcon3 = document.getElementById("balIcon3");
+
+      const startBtn = document.getElementById("startBtn");
+      const startIcon = document.getElementById("startIcon");
+      const startLabel = document.getElementById("startLabel");
+
+      const resetBtn = document.getElementById("resetBtn");
+      const prevBtn = document.getElementById("prevBtn");
+      const nextBtn = document.getElementById("nextBtn");
+
+      const assistBtn = document.getElementById("assistBtn");
+      const assistiveSection = document.getElementById("assistiveSection");
+      const closeAssistBtn = document.getElementById("closeAssistBtn");
+      const assistYes = document.getElementById("assistYes");
+      const assistNo = document.getElementById("assistNo");
+      const assistSwitch = document.getElementById("assistSwitch");
+
+      const helpBtn = document.getElementById("helpBtn");
+      const tutorial = document.getElementById("tutorial");
+      const tutorialOk = document.getElementById("tutorialOk");
+
+      const exitBtn = document.getElementById("exitBtn");
+      const confirmModal = document.getElementById("confirmModal");
+
+      // ====== State
+      let assistEnabled = false;
+      const steps = [
+        { key: "sit", label: "起坐測驗" },
+        { key: "bal1", label: "平衡測驗｜雙腳併攏", bal: 1 },
+        { key: "bal2", label: "平衡測驗｜半併攏", bal: 2 },
+        { key: "bal3", label: "平衡測驗｜一直線", bal: 3 },
+        { key: "walk", label: "行走測驗" },
+      ];
+      let stepIndex = 0;
+      const SIT_TOTAL = 5;
+      let sitDone = 0;
+      const BAL_SECONDS = 10;
+      let timerId = null;
+      let remaining = 0;
+      let runState = "idle";
+
+      function setStatus(text) {
+        statusText.textContent = text;
+      }
+      function clearTimer() {
+        if (timerId) {
+          clearInterval(timerId);
+          timerId = null;
+        }
+      }
+      function isBalanceStep(key) {
+        return key === "bal1" || key === "bal2" || key === "bal3";
+      }
+
+      function showOnlyBalanceIcon(n) {
+        const icons = [balIcon1, balIcon2, balIcon3];
+        icons.forEach((el, idx) => {
+          el.style.display = idx + 1 === n ? "flex" : "none";
+        });
+      }
+
+      function renderGhostHint() {
+        const step = steps[stepIndex];
+        if (isBalanceStep(step.key)) {
+          ghostBigIcon.style.display = "none";
+          showOnlyBalanceIcon(step.bal || 1);
+        } else {
+          showOnlyBalanceIcon(0);
+          ghostBigIcon.style.display = "block";
+          if (step.key === "sit") {
+            ghostBigIcon.className = "fa-solid fa-chair big-icon";
+          } else if (step.key === "walk") {
+            ghostBigIcon.className = "fa-solid fa-person-walking big-icon";
+          }
+        }
+      }
+
+      function renderHeader() {
+        const step = steps[stepIndex];
+        stageTitle.textContent = step.label;
+        if (step.key === "sit") {
+          stageSub.textContent = `總共 ${SIT_TOTAL} 次｜已完成 ${sitDone} / ${SIT_TOTAL}`;
+        } else if (isBalanceStep(step.key)) {
+          stageSub.textContent = `倒數 ${BAL_SECONDS} 秒｜完成後可下一步`;
+        } else if (step.key === "walk") {
+          stageSub.textContent = `開始後往前走｜進入綠色區塊完成`;
+        }
+      }
+
+      function renderButtons() {
+        prevBtn.disabled = stepIndex === 0;
+        nextBtn.disabled = stepIndex === steps.length - 1;
+
+        if (runState === "idle") {
+          startIcon.className = "fa-solid fa-play";
+          startLabel.textContent = "開始";
+        } else if (runState === "running") {
+          // 這裡改用旋轉圖示，並加上 fa-spin 類別讓它轉動
+          startIcon.className = "fa-solid fa-circle-notch fa-spin";
+          startLabel.textContent = "持續中";
+        } else if (runState === "paused") {
+          startIcon.className = "fa-solid fa-play";
+          startLabel.textContent = "繼續";
+        } else if (runState === "done") {
+          startIcon.className = "fa-solid fa-check";
+          startLabel.textContent = "完成";
+        }
+      }
+
+      function resetStepRuntime() {
+        clearTimer();
+        runState = "idle";
+        remaining = 0;
+        const step = steps[stepIndex];
+        if (step.key === "sit") {
+          sitDone = 0;
+          setStatus("起坐待機｜按開始後，每完成一次起坐點一下開始鍵記次");
+        } else if (isBalanceStep(step.key)) {
+          setStatus("平衡待機｜按開始開始 10 秒倒數，完成自動通過");
+        } else if (step.key === "walk") {
+          setStatus("行走待機｜按開始後開始行走，進入綠色區塊即完成");
+        }
+        renderHeader();
+        renderGhostHint();
+        renderButtons();
+      }
+
+      function gotoStep(newIndex) {
+        clearTimer();
+        stepIndex = Math.max(0, Math.min(steps.length - 1, newIndex));
+        runState = "idle";
+        remaining = 0;
+        const step = steps[stepIndex];
+        if (step.key === "sit") {
+          setStatus("起坐測驗｜每完成一次起坐，按一下開始鍵記次");
+        } else if (isBalanceStep(step.key)) {
+          setStatus("平衡測驗｜按開始開始倒數 10 秒，保持姿勢不動");
+        } else if (step.key === "walk") {
+          setStatus("行走測驗｜按開始後往前走，走進綠色區塊完成");
+        }
+        renderHeader();
+        renderGhostHint();
+        renderButtons();
+      }
+
+      function startOrToggle() {
+        const step = steps[stepIndex];
+        if (runState === "done") {
+          if (stepIndex < steps.length - 1) gotoStep(stepIndex + 1);
+          return;
+        }
+        if (step.key === "sit") {
+          if (runState === "idle") {
+            runState = "running";
+            setStatus("起坐進行中｜完成一次起坐後按一下開始鍵");
+            renderButtons();
+            return;
+          }
+          if (runState === "running") {
+            sitDone = Math.min(SIT_TOTAL, sitDone + 1);
+            renderHeader();
+            if (sitDone >= SIT_TOTAL) {
+              runState = "done";
+              setStatus("起坐完成｜可按完成或下一步進入平衡");
+            } else {
+              setStatus(`起坐進行中｜已完成 ${sitDone} / ${SIT_TOTAL}`);
+            }
+            renderButtons();
+            return;
+          }
+          if (runState === "paused") {
+            runState = "running";
+            setStatus("起坐繼續｜完成一次起坐後按一下開始鍵");
+            renderButtons();
+            return;
+          }
+        }
+        if (isBalanceStep(step.key)) {
+          if (runState === "idle" || runState === "paused") {
+            runState = "running";
+            if (remaining <= 0 || remaining > BAL_SECONDS)
+              remaining = BAL_SECONDS;
+            setStatus(`倒數中… ${remaining} 秒`);
+            renderButtons();
+            clearTimer();
+            timerId = setInterval(() => {
+              if (runState !== "running") return;
+              remaining -= 1;
+              if (remaining <= 0) {
+                clearTimer();
+                runState = "done";
+                remaining = 0;
+                setStatus("平衡完成｜可按完成或下一步");
+                renderButtons();
+                return;
+              }
+              setStatus(`倒數中… ${remaining} 秒`);
+            }, 1000);
+            return;
+          }
+          if (runState === "running") {
+            runState = "paused";
+            setStatus(`已暫停｜剩餘 ${remaining} 秒`);
+            renderButtons();
+            return;
+          }
+        }
+        if (step.key === "walk") {
+          if (runState === "idle" || runState === "paused") {
+            runState = "running";
+            setStatus("行走中…請往前走，進入綠色區塊即完成");
+            renderButtons();
+            return;
+          }
+          if (runState === "running") {
+            runState = "paused";
+            setStatus("已暫停｜可繼續或重置");
+            renderButtons();
+            return;
+          }
+        }
+      }
+
+      function completeWalkByGreenZone() {
+        if (steps[stepIndex].key !== "walk") return;
+        if (runState !== "running" && runState !== "paused") return;
+        runState = "done";
+        setStatus("已進入綠色區塊｜行走完成");
+        renderButtons();
+      }
+
+      // ====== Events
+      startBtn.addEventListener("click", startOrToggle);
+      resetBtn.addEventListener("click", resetStepRuntime);
+      prevBtn.addEventListener("click", () => {
+        if (stepIndex === 0) return;
+        gotoStep(stepIndex - 1);
+      });
+      nextBtn.addEventListener("click", () => {
+        if (stepIndex >= steps.length - 1) return;
+        gotoStep(stepIndex + 1);
+      });
+
+      window.addEventListener("keydown", (e) => {
+        if (e.key.toLowerCase() === "g") completeWalkByGreenZone();
+      });
+
+      assistBtn.addEventListener("click", () =>
+        assistiveSection.classList.add("active"),
+      );
+      closeAssistBtn.addEventListener("click", () =>
+        assistiveSection.classList.remove("active"),
+      );
+
+      function setAssist(enabled) {
+        assistEnabled = enabled;
+        assistYes.classList.toggle("active", enabled);
+        assistNo.classList.toggle("active", !enabled);
+        assistSwitch.checked = enabled;
+        assistBadge.textContent = enabled ? "有輔具" : "無輔具";
+        setStatus(enabled ? "已選擇：有輔具" : "已選擇：無輔具");
+      }
+
+      assistYes.addEventListener("click", () => setAssist(true));
+      assistNo.addEventListener("click", () => setAssist(false));
+      assistSwitch.addEventListener("change", (e) =>
+        setAssist(e.target.checked),
+      );
+
+      helpBtn.addEventListener("click", () => tutorial.classList.add("active"));
+      tutorialOk.addEventListener("click", () =>
+        tutorial.classList.remove("active"),
+      );
+      tutorial.addEventListener("click", (e) => {
+        if (e.target === tutorial) tutorial.classList.remove("active");
+      });
+
+      exitBtn.addEventListener(
+        "click",
+        () => (confirmModal.style.display = "flex"),
+      );
+      document
+        .getElementById("confirmNo")
+        .addEventListener("click", () => (confirmModal.style.display = "none"));
+      document
+        .getElementById("confirmYes")
+        .addEventListener("click", () => location.reload());
+
+      // ====== init
+      window.addEventListener("load", () => {
+        // [新增] 顯示姓名
+        userNameDisplay.textContent = `受測者：${KNOWN_USER_NAME}`;
+
+        tutorial.classList.add("active");
+        setAssist(false);
+        gotoStep(0);
+      });
+    </script>
   </body>
 </html>
-<script>
-  const lockBtn = document.getElementById("lockBtn");
-  const lockText = document.getElementById("lockText");
-  const assistSwitch = document.getElementById("assistSwitch");
-  const assistYes = document.getElementById("assistYes");
-  const assistNo = document.getElementById("assistNo");
-  const exitBtn = document.getElementById("exitBtn");
-  const confirmModal = document.getElementById("confirmModal");
-  const confirmYes = document.getElementById("confirmYes");
-  const confirmNo = document.getElementById("confirmNo");
-
-  lockBtn.addEventListener("click", () => {
-    const unlocked = lockBtn.classList.toggle("active");
-    const icon = lockBtn.querySelector("i");
-
-    if (unlocked) {
-      icon.classList.replace("fa-lock", "fa-lock-open");
-      lockText.textContent = "測驗中";
-    } else {
-      icon.classList.replace("fa-lock-open", "fa-lock");
-      lockText.textContent = "點擊開始";
-    }
-  });
-  const toggleAssistBtn = document.getElementById("toggleAssistBtn");
-  const assistiveSection = document.getElementById("assistiveSection");
-  const closeAssistBtn = document.getElementById("closeAssistBtn");
-
-  // 點擊按鈕滑出輔具區
-  toggleAssistBtn.addEventListener("click", () => {
-    assistiveSection.classList.add("active");
-  });
-
-  // 點擊叉叉收回
-  closeAssistBtn.addEventListener("click", () => {
-    assistiveSection.classList.remove("active");
-  });
-
-  assistYes.addEventListener("click", () => {
-    assistYes.classList.add("active");
-    assistNo.classList.remove("active");
-    assistSwitch.checked = true;
-  });
-  assistNo.addEventListener("click", () => {
-    assistNo.classList.add("active");
-    assistYes.classList.remove("active");
-    assistSwitch.checked = false;
-  });
-
-  assistSwitch.addEventListener("change", (e) => {
-    if (e.target.checked) {
-      assistYes.classList.add("active");
-      assistNo.classList.remove("active");
-    } else {
-      assistNo.classList.add("active");
-      assistYes.classList.remove("active");
-    }
-  });
-
-  exitBtn.addEventListener("click", () => {
-    confirmModal.style.display = "flex";
-  });
-  confirmNo.addEventListener("click", () => {
-    confirmModal.style.display = "none";
-  });
-  confirmYes.addEventListener("click", () => {
-    confirmModal.style.display = "none";
-    alert("您已離開測驗");
-  });
-
-  // 預設：無輔具模式亮起
-  assistNo.classList.add("active");
-</script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>

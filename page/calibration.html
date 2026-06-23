@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>校準畫面 - 防跌醫療風格</title>
+
+    <!-- ✅ 新增：Font Awesome（用 icon 顯示行走/起坐/平衡） -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
+    />
+
+    <style>
+      body {
+        margin: 0;
+        font-family: "Segoe UI", sans-serif;
+        height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+
+      .app-container {
+        width: 90%;
+        max-width: 360px;
+        background: #111827;
+        backdrop-filter: blur(8px);
+        display: flex;
+        flex-direction: column;
+        padding: 16px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        color: #fff;
+      }
+
+      /* 身高輸入 */
+      .height-input {
+        margin-bottom: 12px;
+      }
+
+      .height-input label {
+        font-weight: 600;
+        font-size: 14px;
+        display: block;
+        margin-bottom: 4px;
+      }
+
+      .height-input input {
+        width: 100%;
+        box-sizing: border-box;
+        padding: 10px;
+
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        font-size: 14px;
+        background: rgba(255, 255, 255, 0.1);
+        color: #fff;
+      }
+
+      .height-input input::placeholder {
+        color: rgba(255, 255, 255, 0.5);
+      }
+
+      /* 使用舊紀錄 */
+      .reuse-record {
+        margin-bottom: 16px;
+      }
+
+      .reuse-btn {
+        width: 100%;
+        padding: 10px;
+
+        border: 1px solid #0d9488;
+        background: transparent;
+        color: #5eead4;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+      }
+
+      .reuse-btn:hover {
+        background: rgba(13, 148, 136, 0.15);
+      }
+
+      .record-hint {
+        margin-top: 6px;
+        font-size: 12px;
+        color: rgba(255, 255, 255, 0.6);
+        text-align: center;
+      }
+
+      /* 垂直資訊 */
+      .vertical-info {
+        background: rgba(255, 255, 255, 0.1);
+        padding: 10px 12px;
+
+        font-size: 14px;
+        margin-bottom: 16px;
+        text-align: center;
+      }
+
+      .vertical-info span.value {
+        color: #facc15;
+        font-weight: 700;
+        font-size: 15px;
+        margin: 0 4px;
+      }
+
+      /* 狀態顯示 */
+      .status-buttons {
+        display: flex;
+        justify-content: space-between;
+        gap: 12px;
+        margin-bottom: 20px;
+      }
+
+      .status {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 10px 0;
+        background: rgba(255, 255, 255, 0.2);
+        color: rgba(255, 255, 255, 0.6);
+        user-select: none;
+        font-weight: 600;
+        font-size: 13px;
+      }
+
+      .status .indicator {
+        width: 16px;
+        height: 16px;
+        border-radius: 50%;
+        background: #6b7280;
+        margin-bottom: 6px;
+      }
+
+      .status.active {
+        color: #fff;
+      }
+
+      .status.active .indicator {
+        background: #0d9488;
+      }
+
+      /* ✅ 新增：狀態 icon */
+      .status .status-icon {
+        font-size: 18px;
+        line-height: 1;
+        margin-top: 2px;
+      }
+
+      /* 清除紀錄 */
+      .footer-actions {
+        display: flex;
+        justify-content: flex-end;
+      }
+
+      .clear-btn {
+        background: transparent;
+        border: 1px solid #ef4444;
+        color: #fca5a5;
+        padding: 6px 12px;
+
+        font-size: 12px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+      }
+
+      .clear-btn:hover {
+        background: rgba(239, 68, 68, 0.15);
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="app-container">
+      <!-- 身高輸入 -->
+      <div class="height-input">
+        <label for="height">輸入身高 (cm)</label>
+        <input type="number" id="height" placeholder="例如：170" />
+      </div>
+
+      <!-- 使用上一次校準 -->
+      <div class="reuse-record">
+        <button class="reuse-btn">使用上一次校準紀錄</button>
+        <div class="record-hint">已存在校準資料（2025 / 01 / 05）</div>
+      </div>
+
+      <!-- 與地垂直差 -->
+      <div class="vertical-info">
+        與地垂直差:
+        <span class="value">8</span> 度　 左右偏移:
+        <span class="value">-0.04</span>
+      </div>
+
+      <!-- 狀態顯示（✅ 文字改 icon） -->
+      <div class="status-buttons">
+        <div class="status active" aria-label="行走">
+          <div class="indicator"></div>
+          <i
+            class="fa-solid fa-person-walking status-icon"
+            aria-hidden="true"
+          ></i>
+        </div>
+
+        <div class="status" aria-label="起坐">
+          <div class="indicator"></div>
+          <i class="fa-solid fa-chair status-icon" aria-hidden="true"></i>
+        </div>
+
+        <div class="status" aria-label="平衡">
+          <div class="indicator"></div>
+          <i
+            class="fa-solid fa-scale-balanced status-icon"
+            aria-hidden="true"
+          ></i>
+        </div>
+      </div>
+
+      <!-- 清除紀錄 -->
+      <div class="footer-actions">
+        <button class="clear-btn">清除校準紀錄</button>
+      </div>
+    </div>
+  </body>
+</html>

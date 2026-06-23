@@ -1,0 +1,314 @@
+<!doctype html>
+<html lang="zh-TW">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
+    <title>校準操作說明</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
+    />
+    <style>
+      :root {
+        --primary: #0d9488;
+        --success: #34c759;
+        --bg: #ffffff;
+        --accent-bg: #e0f7fa;
+        --text-dark: #1a1a1a;
+        --text-gray: #6b7280;
+        --border: #e5e7eb;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+        height: 100%;
+        font-family:
+          "Segoe UI",
+          -apple-system,
+          system-ui,
+          sans-serif;
+        background: var(--bg);
+        color: var(--text-dark);
+        overflow: hidden;
+      }
+
+      #app {
+        height: 100vh;
+        display: flex;
+        flex-direction: column;
+      }
+
+      /* ===== Header ===== */
+      .app-header {
+        padding: 18px 20px 10px;
+        border-bottom: 1px solid var(--border);
+      }
+
+      .app-header h1 {
+        font-size: 18px;
+        margin: 0;
+        font-weight: 700;
+      }
+
+      .progress {
+        margin-top: 10px;
+        height: 4px;
+        background: #e5e7eb;
+        border-radius: 10px;
+        overflow: hidden;
+      }
+
+      .progress-bar {
+        height: 100%;
+        width: 50%;
+        background: var(--primary);
+        transition: 0.3s;
+      }
+
+      /* ===== Content ===== */
+      .content {
+        flex: 1;
+        position: relative;
+      }
+
+      .step-page {
+        position: absolute;
+        inset: 0;
+        padding: 24px 20px 140px;
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+        opacity: 0;
+        pointer-events: none;
+        transition: 0.35s ease;
+      }
+
+      .step-page.active {
+        opacity: 1;
+        pointer-events: auto;
+      }
+
+      .step-title {
+        font-size: 22px;
+        font-weight: 800;
+        color: var(--primary);
+      }
+
+      .step-desc {
+        display: flex; /* 改為 flex 以應對較長文字 */
+        align-items: flex-start;
+        gap: 8px;
+        padding: 14px 18px;
+        border-radius: 20px;
+        background: var(--accent-bg);
+        color: var(--text-gray);
+        font-weight: 600;
+        font-size: 15px;
+        line-height: 1.4;
+      }
+
+      .step-desc i {
+        color: var(--primary);
+        margin-top: 2px;
+      }
+
+      .img-box {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 2px dashed var(--border);
+        border-radius: 16px;
+        background: #fafafa;
+      }
+
+      .img-box img {
+        max-width: 90%;
+        max-height: 90%;
+        object-fit: contain;
+        filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.08));
+      }
+
+      /* ===== Bottom Action ===== */
+      .action-layer {
+        position: absolute;
+        bottom: 0;
+        width: 100%;
+        padding: 20px 20px 36px;
+        background: linear-gradient(transparent, #fff 35%);
+      }
+
+      .dots {
+        display: flex;
+        justify-content: center;
+        gap: 8px;
+        margin-bottom: 18px;
+      }
+
+      .dot {
+        width: 6px;
+        height: 6px;
+        background: #d1d5db;
+        border-radius: 999px;
+        transition: 0.3s;
+      }
+
+      .dot.active {
+        width: 20px;
+        background: var(--primary);
+      }
+
+      .nav-btns {
+        display: flex;
+        justify-content: space-between;
+        gap: 12px;
+      }
+
+      .btn {
+        flex: 1;
+        padding: 14px;
+        font-size: 16px;
+        font-weight: 700;
+        border-radius: 14px;
+        border: none;
+        cursor: pointer;
+        transition: 0.2s;
+      }
+
+      .btn-prev {
+        background: #f3f4f6;
+        color: var(--text-gray);
+      }
+
+      .btn-next {
+        background: var(--primary);
+        color: #fff;
+        box-shadow: 0 8px 16px rgba(13, 148, 136, 0.25);
+      }
+
+      .btn:active {
+        transform: scale(0.96);
+      }
+
+      .btn:disabled {
+        opacity: 0;
+        pointer-events: none;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div id="app">
+      <div class="app-header">
+        <h1>系統校準操作說明</h1>
+        <div class="progress">
+          <div class="progress-bar" id="progressBar"></div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="step-page active">
+          <div class="step-title">步驟 1：準備工作</div>
+          <div class="step-desc">
+            <i class="fa-solid fa-volume-high"></i>
+            <div>請開啟手機聲音聽指示，並輸入您的正確身高（如圖所示）。</div>
+          </div>
+          <div class="img-box">
+            <img
+              src="../img/70.jpg"
+              alt="輸入身高示意圖"
+              onerror="
+                this.src = 'https://placehold.co/300x400?text=校準畫面截圖1'
+              "
+            />
+          </div>
+        </div>
+
+        <div class="step-page">
+          <div class="step-title">步驟 2：進行校準</div>
+          <div class="step-desc">
+            <i class="fa-solid fa-person-walking-arrow-loop-left"></i>
+            <div>請開始緩慢往後退，聽到語音說「完成」代表校準完整。</div>
+          </div>
+          <div class="img-box">
+            <img
+              src="../img/60.png"
+              alt="後退校準示意圖"
+              onerror="
+                this.src = 'https://placehold.co/300x400?text=校準畫面截圖2'
+              "
+            />
+          </div>
+        </div>
+      </div>
+
+      <div class="action-layer">
+        <div class="dots">
+          <div class="dot active"></div>
+          <div class="dot"></div>
+        </div>
+
+        <div class="nav-btns">
+          <button class="btn btn-prev" id="prevBtn" disabled>上一步</button>
+          <button class="btn btn-next" id="nextBtn">下一頁</button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      let step = 0;
+      const pages = document.querySelectorAll(".step-page");
+      const dots = document.querySelectorAll(".dot");
+      const prevBtn = document.getElementById("prevBtn");
+      const nextBtn = document.getElementById("nextBtn");
+      const progressBar = document.getElementById("progressBar");
+
+      function update() {
+        pages.forEach((p) => p.classList.remove("active"));
+        dots.forEach((d) => d.classList.remove("active"));
+
+        pages[step].classList.add("active");
+        dots[step].classList.add("active");
+
+        prevBtn.disabled = step === 0;
+
+        progressBar.style.width = `${((step + 1) / pages.length) * 100}%`;
+
+        if (step === pages.length - 1) {
+          nextBtn.textContent = "開始校準";
+          nextBtn.style.background = "var(--success)";
+        } else {
+          nextBtn.textContent = "下一頁";
+          nextBtn.style.background = "var(--primary)";
+        }
+      }
+
+      prevBtn.onclick = () => {
+        if (step > 0) {
+          step--;
+          update();
+        }
+      };
+
+      nextBtn.onclick = () => {
+        if (step < pages.length - 1) {
+          step++;
+          update();
+        } else {
+          // 點擊「開始校準」後的邏輯
+          console.log("導向校準功能頁面");
+          alert("現在開始校準，請依照語音指示操作");
+        }
+      };
+    </script>
+  </body>
+</html>

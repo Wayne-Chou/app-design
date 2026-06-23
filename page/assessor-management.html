@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- Font Awesome -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
+    />
+
+    <!-- Bootstrap -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+
+    <title>鑑測人員編輯</title>
+
+    <style>
+      body {
+        font-family: "Segoe UI", sans-serif;
+        background: #e0f7fa;
+        margin: 0;
+        height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+
+      .content {
+        background: #fff;
+        width: 100%;
+        max-width: 480px;
+        display: flex;
+        flex-direction: column;
+      }
+
+      /* Header */
+      .header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 12px 16px;
+        background: #0d9488;
+        color: #fff;
+      }
+
+      .header i {
+        font-size: 20px;
+        cursor: pointer;
+      }
+
+      /* 搜尋 */
+      .search-box {
+        padding: 10px;
+      }
+
+      /* 人員列表 */
+      .person-list {
+        flex: 1;
+        overflow-y: auto;
+        padding: 0 10px 16px;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+
+      .person-card {
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        padding: 14px 16px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .person-name {
+        font-weight: 600;
+        color: #333;
+      }
+
+      /* 編輯文字按鈕 */
+      .edit-btn {
+        background: #ffffff;
+        border: 1.5px solid #0d9488;
+        color: #0d9488;
+        font-size: 14px;
+        font-weight: 600;
+        padding: 6px 14px;
+
+        cursor: pointer;
+        transition: all 0.2s ease;
+        line-height: 1;
+      }
+
+      .edit-btn:hover {
+        color: #0f766e;
+        text-decoration: underline;
+      }
+
+      /* Modal */
+      .modal-header i {
+        cursor: pointer;
+      }
+      .unit-tag {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 14px;
+        font-weight: 600;
+        color: #065f46;
+        background: #d1fae5;
+        padding: 4px 8px;
+
+        margin-bottom: 10px;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="content">
+      <!-- Header -->
+      <div class="header">
+        <i class="fa-solid fa-arrow-left"></i>
+        <i
+          class="fa-solid fa-user-plus"
+          title="新增人員"
+          data-bs-toggle="modal"
+          data-bs-target="#editModal"
+          id="createPersonBtn"
+        ></i>
+      </div>
+      <div class="unit-tag">單位：台北榮總復健中心</div>
+
+      <!-- 搜尋 -->
+      <div class="search-box">
+        <input
+          type="text"
+          class="form-control"
+          id="searchInput"
+          placeholder="搜尋人員"
+        />
+      </div>
+
+      <!-- 人員列表 -->
+      <div class="person-list" id="personList">
+        <div
+          class="person-card"
+          data-name="王小明"
+          data-gender="male"
+          data-birth="1980-05-12"
+        >
+          <div class="person-name">王小明</div>
+          <button class="edit-btn">編輯</button>
+        </div>
+
+        <div
+          class="person-card"
+          data-name="李小華"
+          data-gender="female"
+          data-birth="1975-11-03"
+        >
+          <div class="person-name">李小華</div>
+          <button class="edit-btn">編輯</button>
+        </div>
+
+        <div
+          class="person-card"
+          data-name="陳大華"
+          data-gender="male"
+          data-birth="1990-02-20"
+        >
+          <div class="person-name">陳大華</div>
+          <button class="edit-btn">編輯</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal fade" id="editModal" tabindex="-1">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <i class="fa-solid fa-arrow-left" data-bs-dismiss="modal"></i>
+            <h5 class="modal-title" id="modalTitle">建立人員資料</h5>
+          </div>
+
+          <div class="modal-body">
+            <div class="mb-3">
+              <label class="form-label">姓名</label>
+              <input type="text" class="form-control" id="nameInput" />
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label">性別</label>
+              <select class="form-select" id="genderInput">
+                <option value="">請選擇性別</option>
+                <option value="male">男</option>
+                <option value="female">女</option>
+              </select>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label">生日</label>
+              <input type="date" class="form-control" id="birthInput" />
+            </div>
+
+            <button class="btn btn-primary w-100" id="saveBtn">建立完成</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Page JS -->
+    <script>
+      const editModal = new bootstrap.Modal(
+        document.getElementById("editModal")
+      );
+      const modalTitle = document.getElementById("modalTitle");
+      const saveBtn = document.getElementById("saveBtn");
+      const nameInput = document.getElementById("nameInput");
+      const genderInput = document.getElementById("genderInput");
+      const birthInput = document.getElementById("birthInput");
+
+      let currentCard = null;
+
+      // 點擊編輯
+      document.querySelectorAll(".edit-btn").forEach((btn) => {
+        btn.addEventListener("click", (e) => {
+          currentCard = e.target.closest(".person-card");
+
+          nameInput.value = currentCard.dataset.name;
+          genderInput.value = currentCard.dataset.gender;
+          birthInput.value = currentCard.dataset.birth;
+
+          modalTitle.textContent = "編輯人員資料";
+          saveBtn.textContent = "編輯完成";
+
+          editModal.show();
+        });
+      });
+
+      // 新增人員（清空）
+      document
+        .getElementById("createPersonBtn")
+        .addEventListener("click", () => {
+          currentCard = null;
+          nameInput.value = "";
+          genderInput.value = "";
+          birthInput.value = "";
+
+          modalTitle.textContent = "建立人員資料";
+          saveBtn.textContent = "建立完成";
+        });
+
+      // 儲存
+      saveBtn.addEventListener("click", () => {
+        if (!nameInput.value) return;
+
+        if (currentCard) {
+          // 編輯現有卡片
+          currentCard.dataset.name = nameInput.value;
+          currentCard.dataset.gender = genderInput.value;
+          currentCard.dataset.birth = birthInput.value;
+          currentCard.querySelector(".person-name").textContent =
+            nameInput.value;
+        } else {
+          // 新增卡片（可選，若需要可在這裡動態新增）
+          const personList = document.getElementById("personList");
+          const newCard = document.createElement("div");
+          newCard.className = "person-card";
+          newCard.dataset.name = nameInput.value;
+          newCard.dataset.gender = genderInput.value;
+          newCard.dataset.birth = birthInput.value;
+          newCard.innerHTML = `<div class="person-name">${nameInput.value}</div>
+                         <button class="edit-btn">編輯</button>`;
+          personList.appendChild(newCard);
+
+          // 為新按鈕加上編輯事件
+          newCard.querySelector(".edit-btn").addEventListener("click", (e) => {
+            currentCard = e.target.closest(".person-card");
+
+            nameInput.value = currentCard.dataset.name;
+            genderInput.value = currentCard.dataset.gender;
+            birthInput.value = currentCard.dataset.birth;
+
+            modalTitle.textContent = "編輯人員資料";
+            saveBtn.textContent = "編輯完成";
+
+            editModal.show();
+          });
+        }
+
+        editModal.hide();
+      });
+
+      // 搜尋
+      document.getElementById("searchInput").addEventListener("input", (e) => {
+        const keyword = e.target.value.toLowerCase();
+        document.querySelectorAll(".person-card").forEach((card) => {
+          card.style.display = card.dataset.name.toLowerCase().includes(keyword)
+            ? ""
+            : "none";
+        });
+      });
+    </script>
+  </body>
+</html>

@@ -1,8 +1,9 @@
-<!DOCTYPE html>
-<html lang="en">
+<!doctype html>
+<html lang="zh-TW">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>跌倒風險評估報告</title>
     <link
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
@@ -11,396 +12,715 @@
       href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
       rel="stylesheet"
     />
-    <title>鑑測結果頁</title>
-
     <style>
       :root {
         --primary: #0d9488;
-        --bg: #e0f7fa;
-        --card: #ffffff;
-        --text: #1a1a1a;
+        --primary-dark: #0a7a70;
+        --primary-gradient: linear-gradient(135deg, #0d9488, #14b8a6);
+        --bg-body: #f4f7fa;
+        --card-shadow: 0 12px 30px rgba(0, 0, 0, 0.05);
+        --section-bg: #f8fafc;
+        --status-success: #059669;
       }
 
       body {
-        font-family: "Segoe UI", sans-serif;
-        background: var(--bg);
-        margin: 0;
-        padding: 0;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
+        background-color: var(--bg-body);
+        font-family:
+          -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang TC",
+          "Microsoft JhengHei", sans-serif;
+        padding: 15px 10px;
         min-height: 100vh;
+        color: #1e293b;
       }
 
-      .header {
+      .app-container {
+        max-width: 410px;
+        margin: 0 auto;
+        background: #ffffff;
+        border-radius: 40px;
+        padding: 24px 20px;
+        box-shadow: var(--card-shadow);
+      }
+
+      .app-header {
+        text-align: center;
         margin-bottom: 20px;
       }
-      .header i {
-        font-size: 28px;
+      .app-title {
+        font-size: 1.25rem;
+        font-weight: 800;
+        color: #0f172a;
+        margin: 0;
+      }
+
+      /* 新增姓名與日期樣式 */
+      .user-meta {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 6px;
+        margin-top: 10px;
+      }
+      .user-name {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: #334155;
+      }
+      .date-selector-wrap {
+        display: flex;
+        align-items: center;
+        background: #f1f5f9;
+        padding: 5px 15px;
+        border-radius: 20px;
+        transition: 0.3s;
+      }
+      .date-selector-wrap:hover {
+        background: #e2e8f0;
+      }
+      .date-input {
+        border: none;
+        background: transparent;
+        font-size: 0.8rem;
+        font-weight: 700;
         color: var(--primary);
+        outline: none;
         cursor: pointer;
+        font-family: inherit;
       }
-
-      /* Main card */
-      .result-card {
-        background: var(--card);
-        margin: 20px auto;
-        padding: 20px;
-        width: 100%;
-        max-width: 480px;
-
-        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.12);
-      }
-
-      .name-title {
-        font-size: 22px;
-        font-weight: 700;
-        color: var(--primary);
-      }
-
       .date-label {
+        font-size: 0.75rem;
         color: #94a3b8;
-        font-size: 13px;
-        margin-top: 2px;
-      }
-      .date-label i {
-        margin-right: 4px;
-        opacity: 0.6;
-      }
-
-      .section-title {
-        margin-top: 16px;
-        font-size: 16px;
         font-weight: 700;
-        color: var(--primary);
-      }
-
-      .score-card {
-        background: #f8fdfd;
-        border-radius: 12px;
-        padding: 14px 16px;
-        margin-top: 14px;
+        margin-right: 8px;
         display: flex;
         align-items: center;
-        gap: 12px;
-        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+        gap: 4px;
       }
 
-      .score-icon {
-        font-size: 24px;
-        width: 38px;
-        height: 38px;
-        background: var(--primary);
-        color: #fff;
-        border-radius: 8px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-      }
-      .score-icon i {
-        font-size: 20px;
-      }
-      .score-body {
-        flex: 1;
+      .gauge-section {
+        position: relative;
+        width: 100%;
+        height: 180px;
+        margin-bottom: 5px;
       }
 
-      .score-body .name {
-        font-size: 15px;
-        font-weight: 600;
-        color: #333;
+      .norm-card {
+        background: var(--section-bg);
+        border-radius: 28px;
+        padding: 20px;
+        margin-bottom: 20px;
+        border: 1px solid #edf2f7;
       }
-
-      .score-body .meta {
-        font-size: 13px;
-        color: #777;
-        margin-top: 2px;
+      .norm-title-row {
+        font-size: 0.85rem;
+        font-weight: 800;
+        color: #64748b;
+        margin-bottom: 10px;
       }
-
-      .score-body .bar {
-        margin-top: 6px;
-        background: #e6f5f4;
-        height: 8px;
-        border-radius: 6px;
-      }
-
-      .score-body .bar span {
-        display: block;
-        height: 100%;
-        background: var(--primary);
-        border-radius: 6px;
-      }
-
-      .score-value {
-        font-size: 18px;
-        font-weight: 700;
-        color: var(--primary);
-        min-width: 55px;
-        text-align: right;
-      }
-
-      .sppb-card {
-        margin-top: 16px;
-        padding: 16px;
-        background: #fffef5;
-        border-radius: 12px;
-        border-left: 4px solid #facc15;
-      }
-
-      .sppb-row {
+      .norm-header {
         display: flex;
         justify-content: space-between;
         align-items: center;
+        margin-bottom: 15px;
       }
-
-      .sppb-title {
-        font-size: 16px;
+      .sppb-val {
+        font-size: 2.4rem;
+        font-weight: 900;
+        color: var(--primary);
+        line-height: 1;
+      }
+      .sppb-val small {
+        font-size: 0.9rem;
+        color: #94a3b8;
         font-weight: 700;
-        color: #b7791f;
       }
-
-      .sppb-score {
-        font-size: 18px;
-        font-weight: 700;
-        color: #b7791f;
+      .group-badge {
+        font-size: 0.72rem;
+        font-weight: 800;
+        padding: 6px 12px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        border: 1px solid transparent;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
       }
-
-      .sppb-card .bar {
-        margin-top: 10px;
+      .badge-success {
+        background: #ffffff;
+        color: var(--status-success);
+        border-color: #d1fae5;
+      }
+      .ruler-bar {
         height: 8px;
-        background: #fef3c7;
-        border-radius: 6px;
+        background: #e2e8f0;
+        border-radius: 10px;
+        position: relative;
+      }
+      .ruler-fill {
+        position: absolute;
+        height: 100%;
+        width: 50%;
+        background: var(--primary);
+        border-radius: 10px;
+        opacity: 0.2;
+      }
+      .ruler-pointer {
+        position: absolute;
+        top: -5px;
+        left: 50%;
+        width: 18px;
+        height: 18px;
+        background: var(--primary);
+        border: 3.5px solid #fff;
+        border-radius: 50%;
+        box-shadow: 0 4px 10px rgba(13, 148, 136, 0.3);
+      }
+      .ruler-labels {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 10px;
+        font-size: 0.75rem;
+        color: #64748b;
+        font-weight: 700;
+      }
+
+      .analysis-section {
+        margin-bottom: 20px;
+      }
+      .section-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-left: 5px;
+        margin-bottom: 15px;
+        border-left: 4px solid var(--primary);
+        padding-left: 10px;
+      }
+      .section-label {
+        font-size: 1rem;
+        font-weight: 800;
+        color: #1e293b;
+        margin: 0;
+      }
+
+      .segmented-control {
+        display: flex;
+        background: #f1f5f9;
+        padding: 4px;
+        border-radius: 12px;
+        width: 140px;
+      }
+      .segment-btn {
+        flex: 1;
+        border: none;
+        background: transparent;
+        font-size: 0.7rem;
+        font-weight: 800;
+        padding: 6px 0;
+        border-radius: 9px;
+        color: #64748b;
+        transition: 0.3s;
+      }
+      .segment-btn.active {
+        background: #ffffff;
+        color: var(--primary);
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+      }
+
+      .content-flipper {
+        position: relative;
+        min-height: 180px;
+      }
+      .radar-box,
+      .data-box {
+        border-radius: 30px;
+        border: 1px solid #e2e8f0;
+        transition: 0.3s;
+      }
+
+      .radar-box {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        background: #f1f5f9;
+        padding: 15px 12px;
+      }
+      .radar-wrap {
+        width: 125px;
+        height: 125px;
+        background: #fff;
+        border-radius: 20px;
+        padding: 8px;
+        flex-shrink: 0;
+      }
+      .legend-wrap {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
+      .legend-item {
+        background: #ffffff;
+        padding: 8px 10px;
+        border-radius: 12px;
+        display: flex;
+        align-items: flex-start;
+        gap: 8px;
+      }
+      .legend-item i {
+        font-size: 0.8rem;
+        color: var(--primary);
+        margin-top: 4px;
+        width: 14px;
+        text-align: center;
+      }
+
+      .legend-text {
+        flex: 1;
+      }
+      .legend-text b {
+        font-size: 0.8rem;
+        display: block;
+        color: #1e293b;
+        line-height: 1.2;
+      }
+      .legend-text span {
+        font-size: 0.65rem;
+        color: #94a3b8;
+        font-weight: 500;
+      }
+
+      .score-pill {
+        font-size: 0.65rem;
+        font-weight: 800;
+        background: #f1f5f9;
+        padding: 2px 5px;
+        border-radius: 5px;
+        color: var(--primary);
+        align-self: center;
+      }
+
+      .data-box {
+        display: none;
+        background: #f8fafc;
+        padding: 18px;
+        grid-template-columns: 1fr;
+        gap: 8px;
+      }
+      .detail-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 6px 0;
+        border-bottom: 1px solid #eef2f6;
+      }
+      .detail-row:last-child {
+        border-bottom: none;
+      }
+      .detail-label-group {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .detail-label-group i {
+        width: 16px;
+        color: var(--primary);
+        font-size: 0.85rem;
+      }
+      .detail-label {
+        font-size: 0.85rem;
+        font-weight: 700;
+        color: #64748b;
+      }
+      .detail-value {
+        font-size: 0.9rem;
+        font-weight: 800;
+        color: var(--primary);
+      }
+
+      .result-display-card {
+        background: linear-gradient(90deg, #f8fafc 0%, #ffffff 100%);
+        border-left: 6px solid var(--primary);
+        border-radius: 20px;
+        padding: 16px 20px;
+        margin-bottom: 25px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        position: relative;
         overflow: hidden;
       }
-      .sppb-card .bar span {
-        display: block;
-        height: 100%;
-        background: #fbbf24;
+      .result-display-card::after {
+        content: "\f091";
+        font-family: "Font Awesome 6 Free";
+        font-weight: 900;
+        position: absolute;
+        right: -10px;
+        bottom: -15px;
+        font-size: 5rem;
+        color: var(--primary);
+        opacity: 0.04;
+        transform: rotate(-15deg);
+      }
+      .result-badge {
+        background: var(--primary-gradient);
+        color: white;
+        width: 50px;
+        height: 50px;
+        border-radius: 15px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.8rem;
+        font-weight: 900;
+        box-shadow: 0 5px 15px rgba(13, 148, 136, 0.2);
       }
 
-      .sppb-sub {
-        font-size: 13px;
-        color: #7c6f50;
-        margin-top: 8px;
-      }
-
-      /* 分頁按鈕 */
-      .pagination-area {
-        margin-top: 28px;
+      .btn-group-nav {
         display: flex;
         gap: 12px;
       }
-      .page-btn {
+      .btn-nav {
         flex: 1;
-        padding: 12px 0;
-        font-size: 15px;
+        background: var(--primary-gradient);
+        color: #ffffff;
+        border: none;
+        padding: 15px;
+        border-radius: 20px;
         font-weight: 700;
-        border: none;
-        background: var(--primary);
-        color: #fff;
-        border-radius: 10px;
-        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12);
-        transition: 0.15s;
-      }
-
-      .page-btn:active {
-        transform: scale(0.96);
-      }
-      .design-preview-btn {
-        position: fixed;
-        top: 20px;
-        left: 20px;
-        background: #0d9488;
-        color: #fff;
-        border: none;
-        padding: 8px 14px;
-        border-radius: 10px;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-        font-size: 14px;
-        z-index: 2000;
-      }
-      /* ===== 等級 / 風險 共用列 ===== */
-      .status-row {
+        font-size: 1rem;
         display: flex;
+        align-items: center;
+        justify-content: center;
         gap: 8px;
-        margin-top: 14px;
-      }
-
-      /* 預設：未選中 */
-      .status-item {
-        flex: 1;
-        padding: 10px 6px;
-
-        font-size: 13px;
-        font-weight: 700;
-        text-align: center;
-        background: #e5e7eb;
-        color: #6b7280;
-        opacity: 0.6;
-      }
-
-      /* 選中狀態 */
-      .status-item.active {
-        opacity: 1;
-        color: #fff;
-      }
-
-      .status-item.level-danger.active {
-        background: #dc3545;
-      }
-      .status-item.level-warning.active {
-        background: #ffc107;
-      }
-      .status-item.level-primary.active {
-        background: #0d6efd;
-      }
-      .status-item.level-success.active {
-        background: #198754;
-      }
-
-      .status-item.risk-danger.active {
-        background: #ff5757;
-      }
-      .status-item.risk-high.active {
-        background: #ffa203;
-      }
-      .status-item.risk-medium.active {
-        background: #ffd039;
-      }
-      .status-item.risk-low.active {
-        background: #8cff00;
-      }
-      .status-item.risk-verylow.active {
-        background: #4ffa00;
+        box-shadow: 0 6px 15px rgba(13, 148, 136, 0.2);
       }
     </style>
   </head>
-
   <body>
-    <button
-      class="design-preview-btn"
-      data-bs-toggle="modal"
-      data-bs-target="#designPreviewModal"
-    >
-      對照原始畫面
-    </button>
-
-    <div class="result-card">
-      <div class="header">
-        <i class="fa-solid fa-arrow-left"></i>
-        <div class="name-title">王大明 鑑測結果</div>
-      </div>
-
-      <div class="date-label">
-        <i class="fa-regular fa-calendar"></i> 鑑測日期：2025/06/30
-      </div>
-
-      <div class="section-title">VIVIFRAIL等級結果</div>
-      <div class="status-row">
-        <div class="status-item level-danger active">A 級</div>
-        <div class="status-item level-warning">B 級</div>
-        <div class="status-item level-primary">C 級</div>
-        <div class="status-item level-success">D 級</div>
-      </div>
-      <div class="section-title">跌倒風險等級結果</div>
-      <div class="status-row">
-        <div class="status-item risk-danger">危險</div>
-        <div class="status-item risk-high">高</div>
-        <div class="status-item risk-medium active">中</div>
-        <div class="status-item risk-low">稍低</div>
-        <div class="status-item risk-verylow">低</div>
-      </div>
-
-      <div class="section-title">各項測驗分數</div>
-
-      <div class="score-card" aria-label="平衡測驗">
-        <div class="score-icon">
-          <i class="fa-solid fa-child-reaching"></i>
-        </div>
-        <div class="score-body">
-          <div class="name">平衡測驗</div>
-          <div class="meta">3 / 4 分</div>
-          <div class="bar" aria-hidden="true">
-            <span style="width: 75%"></span>
+    <div class="app-container">
+      <header class="app-header">
+        <h1 class="app-title">跌倒風險評估</h1>
+        <div class="user-meta">
+          <span class="user-name">王小明 先生</span>
+          <div class="date-selector-wrap">
+            <label for="reportDate" class="date-label">
+              <i class="fa-solid fa-magnifying-glass"></i>檢測日期
+            </label>
+            <input
+              type="date"
+              id="reportDate"
+              class="date-input"
+              value="2024-10-24"
+            />
           </div>
         </div>
-        <div class="score-value">3 分</div>
-      </div>
+      </header>
 
-      <div class="score-card" aria-label="起立行走測驗">
-        <div class="score-icon">
-          <i class="fa-solid fa-person-walking"></i>
-        </div>
-        <div class="score-body">
-          <div class="name">起立行走測驗</div>
-          <div class="meta">4 / 4 分</div>
-          <div class="bar" aria-hidden="true">
-            <span style="width: 100%"></span>
+      <div class="gauge-section"><canvas id="gaugeChart"></canvas></div>
+
+      <section class="norm-card">
+        <div class="norm-title-row">SPPB 總分指標</div>
+        <div class="norm-header">
+          <div class="sppb-val">9<small>/12</small></div>
+          <div class="group-badge badge-success">
+            <i class="fa-solid fa-chart-line"></i> 優於 50% 同齡群體
           </div>
         </div>
-        <div class="score-value">4 分</div>
-      </div>
-
-      <div class="score-card" aria-label="步行測驗">
-        <div class="score-icon">
-          <i class="fa-solid fa-person-running"></i>
+        <div class="ruler-bar">
+          <div class="ruler-fill"></div>
+          <div class="ruler-pointer"></div>
         </div>
-        <div class="score-body">
-          <div class="name">步行測驗</div>
-          <div class="meta">3 / 4 分</div>
-          <div class="bar" aria-hidden="true">
-            <span style="width: 75%"></span>
-          </div>
+        <div class="ruler-labels">
+          <span>0%</span><span>50% (平均)</span><span>100%</span>
         </div>
-        <div class="score-value">3 分</div>
-      </div>
+      </section>
 
-      <div class="card sppb-card" role="region" aria-label="SPPB 總分">
-        <div class="sppb-row">
-          <div class="sppb-title">SPPB 總分</div>
-          <div class="sppb-score">10 / 12</div>
-        </div>
-        <div class="bar" style="width: 100%">
-          <span style="width: 83%"></span>
-        </div>
-      </div>
-
-      <div class="pagination-area">
-        <button class="page-btn">上一頁</button>
-        <button class="page-btn">下一頁</button>
-      </div>
-      <div class="status-row">
-        <div class="status-item level-danger active">A 級</div>
-        <div class="status-item level-warning active">B 級</div>
-        <div class="status-item level-primary active">C 級</div>
-        <div class="status-item level-success active">D 級</div>
-      </div>
-      <div class="status-row">
-        <div class="status-item risk-danger active">危險</div>
-        <div class="status-item risk-high active">高</div>
-        <div class="status-item risk-medium active">中</div>
-        <div class="status-item risk-low active">稍低</div>
-        <div class="status-item risk-verylow active">低</div>
-      </div>
-    </div>
-
-    <div class="modal fade" id="designPreviewModal" tabindex="-1">
-      <div class="modal-dialog modal-dialog-centered modal-lg">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title">對照原始畫面</h5>
+      <section class="analysis-section">
+        <div class="section-header">
+          <h2 class="section-label">核心能力分析</h2>
+          <div class="segmented-control">
             <button
-              type="button"
-              class="btn-close"
-              data-bs-dismiss="modal"
-            ></button>
-          </div>
-          <div class="modal-body text-center">
-            <img src="../img/2.jpg" class="img-fluid rounded" alt="" />
+              class="segment-btn active"
+              id="btnRadar"
+              onclick="switchView('radar')"
+            >
+              圖表
+            </button>
+            <button
+              class="segment-btn"
+              id="btnData"
+              onclick="switchView('data')"
+            >
+              數據
+            </button>
           </div>
         </div>
+
+        <div class="content-flipper">
+          <div id="radarView" class="radar-box">
+            <div class="radar-wrap"><canvas id="radarChart"></canvas></div>
+            <div class="legend-wrap">
+              <div class="legend-item">
+                <i class="fa-solid fa-person-rays"></i>
+                <div class="legend-text">
+                  <b>平衡</b>
+                  <span>靜態站立穩定度佳</span>
+                </div>
+                <span class="score-pill">3/4</span>
+              </div>
+              <div class="legend-item">
+                <i class="fa-solid fa-chair"></i>
+                <div class="legend-text">
+                  <b>起坐</b>
+                  <span>下肢肌力表現正常</span>
+                </div>
+                <span class="score-pill">3/4</span>
+              </div>
+              <div class="legend-item">
+                <i class="fa-solid fa-person-walking"></i>
+                <div class="legend-text">
+                  <b>步行</b>
+                  <span>步態穩健且速度快</span>
+                </div>
+                <span class="score-pill">3/4</span>
+              </div>
+            </div>
+          </div>
+
+          <div id="dataView" class="data-box">
+            <div class="detail-row">
+              <div class="detail-label-group">
+                <i class="fa-solid fa-person-walking"></i
+                ><span class="detail-label">步行速度 (4公尺)</span>
+              </div>
+              <span class="detail-value">4.82 秒</span>
+            </div>
+            <div class="detail-row">
+              <div class="detail-label-group">
+                <i class="fa-solid fa-chair"></i
+                ><span class="detail-label">五次起坐測試</span>
+              </div>
+              <span class="detail-value">12.5 秒</span>
+            </div>
+            <div class="detail-row">
+              <div class="detail-label-group">
+                <i class="fa-solid fa-shoe-prints"></i
+                ><span class="detail-label">並排站立</span>
+              </div>
+              <span class="detail-value">10 秒</span>
+            </div>
+            <div class="detail-row">
+              <div class="detail-label-group">
+                <i class="fa-solid fa-shoe-prints" style="opacity: 0.6"></i
+                ><span class="detail-label">半並排</span>
+              </div>
+              <span class="detail-value">10 秒</span>
+            </div>
+            <div class="detail-row">
+              <div class="detail-label-group">
+                <i
+                  class="fa-solid fa-shoe-prints"
+                  style="transform: rotate(90deg)"
+                ></i
+                ><span class="detail-label">直線站立</span>
+              </div>
+              <span class="detail-value">10 秒</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <div class="result-display-card">
+        <div class="result-info">
+          <div class="label">綜合評估結論</div>
+          <div class="value">VIVIFRAIL 等級</div>
+        </div>
+        <div class="result-badge">C</div>
+      </div>
+
+      <div class="btn-group-nav">
+        <button class="btn-nav">
+          <i class="fa-solid fa-chevron-left"></i>上一頁
+        </button>
+        <button class="btn-nav">
+          下一頁<i class="fa-solid fa-chevron-right"></i>
+        </button>
       </div>
     </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+      function switchView(type) {
+        const radarView = document.getElementById("radarView");
+        const dataView = document.getElementById("dataView");
+        const btnRadar = document.getElementById("btnRadar");
+        const btnData = document.getElementById("btnData");
+        if (type === "radar") {
+          radarView.style.display = "flex";
+          dataView.style.display = "none";
+          btnRadar.classList.add("active");
+          btnData.classList.remove("active");
+        } else {
+          radarView.style.display = "none";
+          dataView.style.display = "grid";
+          btnRadar.classList.remove("active");
+          btnData.classList.add("active");
+        }
+      }
+
+      // --- 最終修正版：等分軌道 + 正中指針 ---
+      const ctxGauge = document.getElementById("gaugeChart");
+      const score = 9; // 0~12
+
+      const riskColors = {
+        danger: "#ff5757",
+        high: "#ffa203",
+        medium: "#ffd039",
+        low: "#8cff00",
+        veryLow: "#4ffa00",
+      };
+
+      function getRiskLevel(val) {
+        if (val <= 2) return { text: "危險", color: riskColors.danger };
+        if (val <= 5) return { text: "高風險", color: riskColors.high };
+        if (val <= 8) return { text: "中度", color: riskColors.medium };
+        if (val <= 11) return { text: "稍低", color: riskColors.low };
+        return { text: "低風險", color: riskColors.veryLow };
+      }
+
+      const level = getRiskLevel(score);
+
+      new Chart(ctxGauge, {
+        type: "doughnut",
+        data: {
+          datasets: [
+            {
+              // 五等份均分
+              data: [1, 1, 1, 1, 1],
+              backgroundColor: [
+                riskColors.danger,
+                riskColors.high,
+                riskColors.medium,
+                riskColors.low,
+                riskColors.veryLow,
+              ],
+              circumference: 180,
+              rotation: 270,
+              borderWidth: 3,
+              borderColor: "#ffffff",
+              cutout: "80%",
+            },
+          ],
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          layout: { padding: { top: 30, bottom: 10 } },
+          plugins: {
+            legend: { display: false },
+            tooltip: { enabled: false },
+          },
+        },
+        plugins: [
+          {
+            id: "needleAndText",
+            afterDraw(chart) {
+              const { ctx, chartArea } = chart;
+              const centerX = (chartArea.left + chartArea.right) / 2;
+              const centerY = chartArea.bottom - 10;
+              const innerRadius =
+                chart.getDatasetMeta(0).controller.innerRadius;
+
+              ctx.save();
+
+              // 1. 繪製中心文字
+              ctx.font = "bold 18px sans-serif";
+              ctx.fillStyle = "#1e293b";
+              ctx.textAlign = "center";
+              ctx.textBaseline = "middle";
+              ctx.fillText(`風險等級：${level.text}`, centerX, centerY);
+
+              // 2. 繪製「直線 + 箭頭」指針
+              const angle = Math.PI + Math.PI * (score / 12);
+
+              // 指針從圓心出發
+              const startDist = 15; // 離開文字中心一點點
+              const endDist = innerRadius - 2; // 接近顏色軌道
+              const arrowSize = 10;
+
+              const startX = centerX + Math.cos(angle) * startDist;
+              const startY = centerY + Math.sin(angle) * startDist;
+              const tipX = centerX + Math.cos(angle) * endDist;
+              const tipY = centerY + Math.sin(angle) * endDist;
+
+              // A. 繪製一直線
+              ctx.beginPath();
+              ctx.moveTo(startX, startY);
+              ctx.lineTo(tipX, tipY);
+              ctx.strokeStyle = "#334155";
+              ctx.lineWidth = 3; // 稍微加粗一點，更顯眼
+              ctx.stroke();
+
+              // B. 繪製最上面的箭頭 (三角形)
+              ctx.beginPath();
+              ctx.moveTo(tipX, tipY);
+              // 計算三角形底部兩個點，讓箭頭看起來更尖銳
+              const baseAngle = 0.4;
+              ctx.lineTo(
+                tipX - arrowSize * Math.cos(angle - baseAngle),
+                tipY - arrowSize * Math.sin(angle - baseAngle),
+              );
+              ctx.lineTo(
+                tipX - arrowSize * Math.cos(angle + baseAngle),
+                tipY - arrowSize * Math.sin(angle + baseAngle),
+              );
+              ctx.closePath();
+              ctx.fillStyle = "#334155";
+              ctx.fill();
+
+              ctx.restore();
+            },
+          },
+        ],
+      });
+      // --- 雷達圖邏輯 ---
+      new Chart(document.getElementById("radarChart"), {
+        type: "radar",
+        data: {
+          labels: ["平衡", "起坐", "步行"],
+          datasets: [
+            {
+              data: [3, 3, 3],
+              backgroundColor: "rgba(13, 148, 136, 0.15)",
+              borderColor: "#0D9488",
+              borderWidth: 2,
+              pointRadius: 2,
+              pointBackgroundColor: "#0D9488",
+            },
+          ],
+        },
+        options: {
+          scales: {
+            r: {
+              min: 0,
+              max: 4,
+              ticks: { display: false, stepSize: 1 },
+              pointLabels: { display: false },
+              grid: { color: "rgba(203, 213, 225, 0.6)" },
+            },
+          },
+          plugins: { legend: { display: false } },
+        },
+      });
+
+      // 日期監聽器
+      document
+        .getElementById("reportDate")
+        .addEventListener("change", function (e) {
+          console.log("正在搜尋日期：", e.target.value);
+          // 在這裡可以加入 AJAX 邏輯抓取該日期的受測數據
+        });
+    </script>
   </body>
 </html>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
