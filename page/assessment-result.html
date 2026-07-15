@@ -571,7 +571,7 @@
 
       // --- 最終修正版：等分軌道 + 正中指針 ---
       const ctxGauge = document.getElementById("gaugeChart");
-      const score = 3; // 0~12
+      const score = 11; // 0~12
 
       const riskColors = {
         danger: "#ff5757",
@@ -643,7 +643,8 @@
               ctx.fillText(`風險等級：${level.text}`, centerX, centerY);
 
               // 2. 繪製「直線 + 箭頭」指針
-              const angle = Math.PI + Math.PI * (score / 12);
+             
+              const angle = Math.PI + Math.PI * ((12 - score) / 12);
 
               // 指針從圓心出發
               const startDist = 15; // 離開文字中心一點點
