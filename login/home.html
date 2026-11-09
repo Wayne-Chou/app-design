@@ -16,6 +16,8 @@
       :root {
         --primary-teal: #0d9488;
         --accent-teal: #14b8a6;
+        --deep-teal: #0f766e;
+        --soft-teal: #ccfbf1;
         --bg-light: #f1f5f9;
         --text-dark: #0f172a;
         --text-gray: #64748b;
@@ -41,7 +43,6 @@
         top: 0;
         z-index: 1000;
       }
-
       .logo-box img {
         width: 32px;
         height: 32px;
@@ -50,12 +51,10 @@
         border-radius: 6px;
       }
 
-      /* 主功能容器 */
+      /* 主功能：只有一顆開始鑑測 */
       .main-focus-container {
         margin: 20px;
       }
-
-      /* 超級主按鈕 */
       .main-focus-card {
         background: linear-gradient(
           135deg,
@@ -70,6 +69,7 @@
         color: white;
         border: none;
         width: 100%;
+        text-align: left;
         box-shadow: 0 10px 25px rgba(13, 148, 136, 0.2);
         cursor: pointer;
         transition: transform 0.2s;
@@ -77,7 +77,6 @@
       .main-focus-card:active {
         transform: scale(0.98);
       }
-
       .main-focus-card h1 {
         font-size: 26px;
         font-weight: 900;
@@ -85,35 +84,13 @@
       }
       .main-focus-card p {
         font-size: 14px;
-        opacity: 0.8;
+        opacity: 0.85;
         margin: 5px 0 0;
       }
       .main-focus-card img {
         width: 60px;
         height: 60px;
         filter: drop-shadow(2px 4px 6px rgba(0, 0, 0, 0.1));
-      }
-
-      /* 快速鑑測入口 - 改為緊跟在後的膠囊設計 */
-      .quick-action-area {
-        margin-top: 12px;
-      }
-      .quick-btn {
-        width: 100%;
-        background: #ffffff;
-        border: 2px solid var(--primary-teal);
-        color: var(--primary-teal);
-        border-radius: 16px;
-        padding: 14px;
-        font-weight: 800;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 10px;
-        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
-      }
-      .quick-btn i {
-        color: #f59e0b;
       }
 
       /* 四格快捷區 */
@@ -159,7 +136,6 @@
         color: var(--text-gray);
         margin-bottom: 12px;
       }
-
       .function-grid {
         display: grid;
         grid-template-columns: 1fr 1fr;
@@ -184,18 +160,169 @@
         font-weight: 600;
       }
 
-      .design-preview-btn {
-        position: fixed;
-        bottom: 20px;
-        left: 20px;
-        background: #334155;
-        color: #fff;
+      /* ===== 選擇測驗彈窗 ===== */
+      .modal-backdrop.show {
+        opacity: 0.45;
+      }
+      .test-modal .modal-dialog {
+        max-width: 380px;
+        margin-left: auto;
+        margin-right: auto;
+        padding: 0 20px;
+      }
+      .test-modal .modal-content {
         border: none;
-        padding: 8px 16px;
-        border-radius: 50px;
-        font-size: 11px;
-        z-index: 2000;
-        opacity: 0.5;
+        border-radius: 28px;
+        overflow: hidden;
+        box-shadow: 0 24px 60px rgba(15, 23, 42, 0.25);
+      }
+
+      /* 彈窗頂部：延續主按鈕的漸層 */
+      .test-modal .modal-top {
+        background: linear-gradient(
+          135deg,
+          var(--primary-teal),
+          var(--accent-teal)
+        );
+        color: white;
+        padding: 24px 24px 22px;
+        position: relative;
+      }
+      .test-modal .modal-top h5 {
+        margin: 0;
+        font-size: 20px;
+        font-weight: 900;
+        letter-spacing: 0.5px;
+      }
+      .test-modal .modal-top p {
+        margin: 4px 0 0;
+        font-size: 13px;
+        opacity: 0.85;
+      }
+      .test-modal .close-btn {
+        position: absolute;
+        top: 18px;
+        right: 18px;
+        width: 34px;
+        height: 34px;
+        border-radius: 50%;
+        border: none;
+        background: rgba(255, 255, 255, 0.2);
+        color: white;
+        font-size: 15px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .test-modal .close-btn:active {
+        background: rgba(255, 255, 255, 0.35);
+      }
+
+      .test-modal .modal-body {
+        padding: 18px 18px 20px;
+        background: #f8fafc;
+      }
+
+      /* 測驗選項 */
+      .test-item {
+        width: 100%;
+        background: white;
+        border: 2px solid #e2e8f0;
+        border-radius: 18px;
+        padding: 16px 16px 16px 18px;
+        margin-bottom: 10px;
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        text-align: left;
+        color: var(--text-dark);
+        transition:
+          border-color 0.15s,
+          background 0.15s,
+          transform 0.15s;
+      }
+      .test-item:last-child {
+        margin-bottom: 0;
+      }
+      .test-item .t-no {
+        font-size: 13px;
+        font-weight: 900;
+        color: var(--primary-teal);
+        background: var(--soft-teal);
+        width: 36px;
+        height: 36px;
+        border-radius: 11px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        font-variant-numeric: tabular-nums;
+        transition: all 0.15s;
+      }
+      .test-item .t-name {
+        flex: 1;
+        min-width: 0;
+        font-size: 17px;
+        font-weight: 800;
+      }
+      .test-item .t-arrow {
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        background: var(--bg-light);
+        color: #94a3b8;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 12px;
+        flex-shrink: 0;
+        transition: all 0.15s;
+      }
+
+      /* 按下／選取時 */
+      .test-item:hover,
+      .test-item:focus-visible {
+        border-color: var(--accent-teal);
+        outline: none;
+      }
+      .test-item:active,
+      .test-item.selected {
+        border-color: var(--primary-teal);
+        background: #f0fdfa;
+        transform: scale(0.98);
+      }
+      .test-item:active .t-no,
+      .test-item.selected .t-no {
+        background: var(--primary-teal);
+        color: white;
+      }
+      .test-item:active .t-arrow,
+      .test-item.selected .t-arrow {
+        background: var(--primary-teal);
+        color: white;
+      }
+
+      /* 提示訊息 */
+      .toast-box {
+        position: fixed;
+        left: 50%;
+        bottom: 24px;
+        transform: translateX(-50%) translateY(20px);
+        background: #0f172a;
+        color: white;
+        padding: 12px 18px;
+        border-radius: 14px;
+        font-size: 14px;
+        font-weight: 600;
+        opacity: 0;
+        pointer-events: none;
+        transition: all 0.25s;
+        z-index: 3000;
+        white-space: nowrap;
+      }
+      .toast-box.show {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
       }
     </style>
   </head>
@@ -205,21 +332,14 @@
       <div class="greeting">單位名稱顯示</div>
     </div>
 
+    <!-- 唯一的測驗入口，測驗再多這裡都不用改 -->
     <div class="main-focus-container">
-      <button class="main-focus-card main-feature">
+      <button class="main-focus-card" id="startBtn">
         <div>
           <h1>開始鑑測</h1>
-          <p>Standard Assessment</p>
         </div>
         <img src="../img/22.png" alt="" />
       </button>
-
-      <div class="quick-action-area">
-        <button class="quick-btn" id="fastTestBtn">
-          <i class="fa-solid fa-bolt-lightning"></i>
-          <span>快速鑑測</span>
-        </button>
-      </div>
     </div>
 
     <div class="grid-shortcuts">
@@ -273,75 +393,100 @@
       </div>
     </div>
 
-    <div class="modal fade" id="groupTestModal" tabindex="-1">
-      <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content" style="border-radius: 20px; border: none">
-          <div class="modal-header border-0">
-            <h5 class="modal-title fw-bold">選擇場域</h5>
+    <!-- 選擇測驗彈窗 -->
+    <div
+      class="modal fade test-modal"
+      id="testModal"
+      tabindex="-1"
+      aria-labelledby="testModalTitle"
+    >
+      <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content">
+          <div class="modal-top">
+            <h5 id="testModalTitle">選擇測驗項目</h5>
+
             <button
               type="button"
-              class="btn-close"
+              class="close-btn"
               data-bs-dismiss="modal"
-            ></button>
+              aria-label="關閉"
+            >
+              <i class="fa-solid fa-xmark"></i>
+            </button>
           </div>
-          <div class="modal-body p-4">
-            <div class="d-flex flex-column gap-2">
-              <button
-                class="btn btn-light py-3 border-0 fw-bold"
-                style="background: #f1f5f9; border-radius: 12px"
-                data-field="A"
-              >
-                場域 A
-              </button>
-              <button
-                class="btn btn-light py-3 border-0 fw-bold"
-                style="background: #f1f5f9; border-radius: 12px"
-                data-field="B"
-              >
-                場域 B
-              </button>
-              <button
-                class="btn btn-light py-3 border-0 fw-bold"
-                style="background: #f1f5f9; border-radius: 12px"
-                data-field="C"
-              >
-                場域 C
-              </button>
-              <button
-                class="btn btn-light py-3 border-0 fw-bold"
-                style="background: #f1f5f9; border-radius: 12px"
-                data-field="D"
-              >
-                場域 D
-              </button>
-            </div>
+          <div class="modal-body">
+            <div id="testList"></div>
           </div>
         </div>
       </div>
     </div>
 
+    <div class="toast-box" id="toastBox"></div>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-      const groupBtn = document.querySelector(".main-feature");
-      const groupModal = new bootstrap.Modal(
-        document.getElementById("groupTestModal"),
+      /* =========================================================
+       * 設定區：新增測驗只要在這裡加一筆，介面不用動
+       * ========================================================= */
+      const TESTS = [
+        { id: "sppb", name: "SPPB" },
+        { id: "gait", name: "行走測驗" },
+        // 範例：之後新增測驗，複製一段加在這裡即可
+        // { id: "grip", name: "握力測驗" },
+      ];
+
+      /* ===== 程式邏輯 ===== */
+      const testModal = new bootstrap.Modal(
+        document.getElementById("testModal"),
       );
+      const testList = document.getElementById("testList");
+      const toastBox = document.getElementById("toastBox");
 
-      // 1. 標準鑑測 (彈出 Modal)
-      groupBtn.addEventListener("click", () => groupModal.show());
+      function renderTests() {
+        testList.innerHTML = TESTS.map(
+          (t, i) => `
+          <button class="test-item" data-test-id="${t.id}">
+            <span class="t-no">${String(i + 1).padStart(2, "0")}</span>
+            <span class="t-name">${t.name}</span>
+            <span class="t-arrow"><i class="fa-solid fa-chevron-right"></i></span>
+          </button>`,
+        ).join("");
+      }
 
-      // 2. 快速鑑測 (直接動作)
-      document.getElementById("fastTestBtn").addEventListener("click", () => {
-        alert("正在進入快速鑑測流程...");
+      // 選好測驗後要做的事（之後接場域選擇或換頁就改這裡）
+      function onTestSelected(test) {
+        console.log("選擇測驗:", test.id);
+        showToast(`已選擇：${test.name}`);
+      }
+
+      let toastTimer;
+      function showToast(msg) {
+        toastBox.textContent = msg;
+        toastBox.classList.add("show");
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(() => toastBox.classList.remove("show"), 2000);
+      }
+
+      document.getElementById("startBtn").addEventListener("click", () => {
+        testList
+          .querySelectorAll(".selected")
+          .forEach((el) => el.classList.remove("selected"));
+        testModal.show();
       });
 
-      // 場域選擇邏輯
-      document.querySelectorAll("#groupTestModal .btn").forEach((btn) => {
-        btn.addEventListener("click", (e) => {
-          console.log("選擇場域:", e.currentTarget.dataset.field);
-          groupModal.hide();
-        });
+      testList.addEventListener("click", (e) => {
+        const btn = e.target.closest("[data-test-id]");
+        if (!btn) return;
+        const test = TESTS.find((t) => t.id === btn.dataset.testId);
+        // 先顯示選取狀態，再關閉彈窗，讓使用者看到自己點了哪個
+        btn.classList.add("selected");
+        setTimeout(() => {
+          testModal.hide();
+          onTestSelected(test);
+        }, 180);
       });
+
+      renderTests();
     </script>
   </body>
 </html>

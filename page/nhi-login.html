@@ -1,0 +1,330 @@
+<!doctype html>
+<html lang="zh-TW">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
+    <title>行走分析系統 - 健保卡登入</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+    />
+    <style>
+      :root {
+        --primary-teal: #0d9488;
+        --accent-teal: #14b8a6;
+        --deep-teal: #0f766e;
+        --soft-teal: #ccfbf1;
+        --mint-bg: #f0fdfa;
+        --bg-light: #f1f5f9;
+        --text-dark: #0f172a;
+        --text-gray: #64748b;
+        --border-light: #e2e8f0;
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        -webkit-tap-highlight-color: transparent;
+      }
+
+      body {
+        background-color: var(--bg-light);
+        color: var(--text-dark);
+        font-family: "PingFang TC", "Microsoft JhengHei", sans-serif;
+        height: 100vh;
+        width: 100vw;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+      }
+
+      /* ── Header：與首頁相同的青綠色 ── */
+      .top-bar {
+        height: 60px;
+        background: var(--primary-teal);
+        color: white;
+        display: flex;
+        align-items: center;
+        padding: 0 20px;
+        z-index: 100;
+        flex-shrink: 0;
+        box-shadow: 0 4px 16px rgba(13, 148, 136, 0.25);
+      }
+
+      .logo-box img {
+        width: 32px;
+        height: 32px;
+        background: white;
+        padding: 4px;
+        border-radius: 6px;
+        display: block;
+      }
+
+      /* ── Main ── */
+      .main-container {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 24px 40px;
+        position: relative;
+        overflow-y: auto;
+      }
+
+      /* 背景淡淡的青綠點陣 */
+      .main-container::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background-image: radial-gradient(
+          circle at 2px 2px,
+          rgba(13, 148, 136, 0.18) 1px,
+          transparent 0
+        );
+        background-size: 36px 36px;
+        pointer-events: none;
+        z-index: 0;
+      }
+
+      /* ── 卡片 ── */
+      .action-card {
+        width: 680px;
+        max-width: 100%;
+        background: white;
+        border-radius: 28px;
+        overflow: hidden;
+        box-shadow: 0 20px 50px rgba(13, 148, 136, 0.15);
+        z-index: 1;
+        display: flex;
+        flex-direction: column;
+      }
+
+      /* 卡片頂部：與「開始鑑測」相同的漸層 */
+      .card-header {
+        background: linear-gradient(
+          135deg,
+          var(--primary-teal),
+          var(--accent-teal)
+        );
+        color: white;
+        padding: 28px 36px;
+        display: flex;
+        align-items: center;
+        gap: 16px;
+      }
+      .card-header-icon {
+        width: 52px;
+        height: 52px;
+        border-radius: 16px;
+        background: rgba(255, 255, 255, 0.2);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+        flex-shrink: 0;
+      }
+      .card-header h2 {
+        font-size: 26px;
+        font-weight: 900;
+        letter-spacing: 1px;
+      }
+
+      .card-body {
+        padding: 36px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 28px;
+      }
+
+      /* 插卡示意圖 */
+      .card-visual {
+        width: 100%;
+
+        padding: 28px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+      .card-visual img {
+        width: 340px;
+        max-width: 100%;
+        height: auto;
+        display: block;
+      }
+
+      /* ── 狀態列 ── */
+      .status-bar {
+        width: 100%;
+        background: white;
+        border: 2px solid var(--soft-teal);
+        border-radius: 18px;
+        padding: 16px 22px;
+        display: flex;
+        align-items: center;
+        gap: 14px;
+      }
+
+      .status-dot {
+        position: relative;
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        background: var(--primary-teal);
+        flex-shrink: 0;
+      }
+      .status-dot::after {
+        content: "";
+        position: absolute;
+        inset: -6px;
+        border-radius: 50%;
+        border: 2px solid var(--accent-teal);
+        animation: pulseRing 1.6s ease-out infinite;
+      }
+      @keyframes pulseRing {
+        0% {
+          transform: scale(0.5);
+          opacity: 1;
+        }
+        100% {
+          transform: scale(1.4);
+          opacity: 0;
+        }
+      }
+
+      .status-text {
+        font-size: 16px;
+        font-weight: 700;
+        color: var(--deep-teal);
+        letter-spacing: 0.5px;
+      }
+
+      /* 讀取中的三個點 */
+      .loading-dots {
+        display: inline-flex;
+        gap: 4px;
+        margin-left: auto;
+      }
+      .loading-dots span {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: var(--accent-teal);
+        animation: dotBounce 1.2s ease-in-out infinite;
+      }
+      .loading-dots span:nth-child(2) {
+        animation-delay: 0.15s;
+      }
+      .loading-dots span:nth-child(3) {
+        animation-delay: 0.3s;
+      }
+      @keyframes dotBounce {
+        0%,
+        80%,
+        100% {
+          opacity: 0.3;
+          transform: translateY(0);
+        }
+        40% {
+          opacity: 1;
+          transform: translateY(-4px);
+        }
+      }
+
+      /* ── 返回按鈕：與首頁膠囊按鈕同風格 ── */
+      .back-btn {
+        align-self: flex-start;
+        padding: 12px 22px;
+        background: white;
+        border: 2px solid var(--primary-teal);
+        border-radius: 16px;
+        color: var(--primary-teal);
+        font-size: 15px;
+        font-weight: 800;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        letter-spacing: 1px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+        transition:
+          background 0.2s,
+          color 0.2s,
+          transform 0.2s;
+      }
+      .back-btn:hover {
+        background: var(--primary-teal);
+        color: white;
+      }
+      .back-btn:active {
+        transform: scale(0.97);
+      }
+
+      @media (max-width: 768px) {
+        .main-container {
+          padding: 20px;
+        }
+        .card-header {
+          padding: 22px 24px;
+        }
+        .card-header h2 {
+          font-size: 22px;
+        }
+        .card-body {
+          padding: 24px;
+          gap: 22px;
+        }
+        .card-visual {
+          padding: 20px;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <header class="top-bar">
+      <div class="logo-box"><img src="../img/logo.png" alt="Logo" /></div>
+    </header>
+
+    <div class="main-container">
+      <div class="action-card">
+        <div class="card-header">
+          <div class="card-header-icon">
+            <i class="fa-solid fa-id-card"></i>
+          </div>
+          <h2>健保卡登入</h2>
+        </div>
+
+        <div class="card-body">
+          <!-- 插卡示意圖 -->
+          <div class="card-visual">
+            <img src="../img/insert-nhi-card.png" alt="請插入健保卡示意圖" />
+          </div>
+
+          <!-- 讀卡機狀態 -->
+          <div class="status-bar">
+            <div class="status-dot"></div>
+            <div class="status-text">讀卡機讀取中</div>
+            <div class="loading-dots">
+              <span></span><span></span><span></span>
+            </div>
+          </div>
+
+          <!-- 返回 -->
+          <button
+            class="back-btn"
+            onclick="location.href = 'walk-test-menu.html'"
+          >
+            <i class="fa-solid fa-arrow-left"></i>
+            返回首頁
+          </button>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

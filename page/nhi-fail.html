@@ -1,0 +1,283 @@
+<!doctype html>
+<html lang="zh-TW">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
+    <title>行走分析系統 - 身分驗證失敗</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+    />
+    <style>
+      :root {
+        --primary-teal: #0d9488;
+        --accent-teal: #14b8a6;
+        --deep-teal: #0f766e;
+        --soft-teal: #ccfbf1;
+        --mint-bg: #f0fdfa;
+        --bg-light: #f1f5f9;
+        --text-dark: #0f172a;
+        --text-gray: #64748b;
+        --border-light: #e2e8f0;
+        --error-red: #dc2626;
+        --error-light: #f87171;
+        --error-soft: #fee2e2;
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        -webkit-tap-highlight-color: transparent;
+      }
+
+      body {
+        background-color: var(--bg-light);
+        color: var(--text-dark);
+        font-family: "PingFang TC", "Microsoft JhengHei", sans-serif;
+        height: 100vh;
+        width: 100vw;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+      }
+
+      /* ── Header：與首頁相同的青綠色 ── */
+      .top-bar {
+        height: 60px;
+        background: var(--primary-teal);
+        color: white;
+        display: flex;
+        align-items: center;
+        padding: 0 20px;
+        z-index: 100;
+        flex-shrink: 0;
+        box-shadow: 0 4px 16px rgba(13, 148, 136, 0.25);
+      }
+
+      .logo-box img {
+        width: 32px;
+        height: 32px;
+        background: white;
+        padding: 4px;
+        border-radius: 6px;
+        display: block;
+      }
+
+      /* ── Main ── */
+      .main-container {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 24px 40px;
+        position: relative;
+        overflow-y: auto;
+      }
+
+      /* 背景淡淡的青綠點陣 */
+      .main-container::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background-image: radial-gradient(
+          circle at 2px 2px,
+          rgba(13, 148, 136, 0.18) 1px,
+          transparent 0
+        );
+        background-size: 36px 36px;
+        pointer-events: none;
+        z-index: 0;
+      }
+
+      /* ── 卡片 ── */
+      .action-card {
+        width: 680px;
+        max-width: 100%;
+        background: white;
+        border-radius: 28px;
+        overflow: hidden;
+        box-shadow: 0 20px 50px rgba(13, 148, 136, 0.15);
+        z-index: 1;
+        display: flex;
+        flex-direction: column;
+      }
+
+      /* 卡片頂部：與「開始鑑測」相同的漸層 */
+      .card-header {
+        background: linear-gradient(
+          135deg,
+          var(--primary-teal),
+          var(--accent-teal)
+        );
+        color: white;
+        padding: 28px 36px;
+        display: flex;
+        align-items: center;
+        gap: 16px;
+      }
+      .card-header h2 {
+        font-size: 26px;
+        font-weight: 900;
+        letter-spacing: 1px;
+      }
+
+      .card-body {
+        padding: 36px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 28px;
+      }
+
+      /* 插卡示意圖 */
+      .card-visual {
+        width: 100%;
+        background: white;
+        border-radius: 22px;
+        padding: 40px 28px 28px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+      .card-visual {
+        flex-direction: column;
+        gap: 18px;
+      }
+
+      .visual-text {
+        font-size: 26px;
+        font-weight: 900;
+        letter-spacing: 2px;
+        color: var(--text-dark);
+        text-align: center;
+      }
+
+      /* 中間失敗叉叉（純 CSS 繪製，與成功頁勾勾同規格） */
+      .fail-mark {
+        position: relative;
+        width: 104px;
+        height: 104px;
+        border-radius: 50%;
+        background: linear-gradient(
+          135deg,
+          var(--error-red),
+          var(--error-light)
+        );
+        box-shadow:
+          0 0 0 10px var(--error-soft),
+          0 12px 28px rgba(220, 38, 38, 0.25);
+        margin: 10px 0 16px;
+      }
+      .fail-mark::before,
+      .fail-mark::after {
+        content: "";
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 50px;
+        height: 8px;
+        border-radius: 4px;
+        background: white;
+      }
+      .fail-mark::before {
+        transform: translate(-50%, -50%) rotate(45deg);
+      }
+      .fail-mark::after {
+        transform: translate(-50%, -50%) rotate(-45deg);
+      }
+
+      .visual-text {
+        font-size: 26px;
+        font-weight: 900;
+        letter-spacing: 2px;
+        color: var(--text-dark);
+        text-align: center;
+      }
+
+      /* ── 返回按鈕：與健保卡登入頁相同 ── */
+      .back-btn {
+        align-self: flex-start;
+        padding: 12px 22px;
+        background: white;
+        border: 2px solid var(--primary-teal);
+        border-radius: 16px;
+        color: var(--primary-teal);
+        font-size: 15px;
+        font-weight: 800;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        letter-spacing: 1px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+        transition:
+          background 0.2s,
+          color 0.2s,
+          transform 0.2s;
+      }
+      .back-btn:hover {
+        background: var(--primary-teal);
+        color: white;
+      }
+      .back-btn:active {
+        transform: scale(0.97);
+      }
+
+      @media (max-width: 768px) {
+        .main-container {
+          padding: 20px;
+        }
+        .card-header {
+          padding: 22px 24px;
+        }
+        .card-header h2 {
+          font-size: 22px;
+        }
+        .card-body {
+          padding: 24px;
+          gap: 22px;
+        }
+        .card-visual {
+          padding: 36px 20px;
+        }
+        .visual-text {
+          font-size: 22px;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <header class="top-bar">
+      <div class="logo-box"><img src="../img/logo.png" alt="Logo" /></div>
+    </header>
+
+    <div class="main-container">
+      <div class="action-card">
+        <div class="card-header">
+          <div>
+            <h2>身分驗證失敗</h2>
+          </div>
+        </div>
+
+        <div class="card-body">
+          <div class="card-visual">
+            <div class="fail-mark" aria-hidden="true"></div>
+            <p class="visual-text">請將健保卡重新插入</p>
+          </div>
+
+          <!-- 返回 -->
+          <button class="back-btn" onclick="location.href = 'nhi-login.html'">
+            <i class="fa-solid fa-arrow-left"></i>
+            返回
+          </button>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
